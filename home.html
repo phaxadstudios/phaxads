@@ -7,555 +7,742 @@
   <meta name="description" content="Phaxar turns a sentence into a deployed website. AI agents build it, infrastructure hosts it, Rael keeps it safe. A product of Apaxaa." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
-          animation: {
-            'float': 'float 8s ease-in-out infinite',
-            'pulse-slow': 'pulse 4s ease-in-out infinite',
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0)' },
-              '50%': { transform: 'translateY(-20px)' },
-            },
-          },
-        },
-      },
-    };
-  </script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <style>
+    @font-face {
+      font-family: 'Mona Sans';
+      src: url('https://cdn.jsdelivr.net/gh/github/mona-sans@main/fonts/webfonts/Mona-Sans.woff2') format('woff2');
+      font-weight: 200 900;
+      font-stretch: 75% 125%;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Hubot Sans';
+      src: url('https://cdn.jsdelivr.net/gh/github/hubot-sans@main/fonts/webfonts/Hubot-Sans.woff2') format('woff2');
+      font-weight: 200 900;
+      font-stretch: 75% 125%;
+      font-display: swap;
+    }
+    :root {
+      --bg: #06060a;
+      --surface: rgba(255,255,255,0.025);
+      --border: rgba(255,255,255,0.09);
+      --text: #f5f5f7;
+      --muted: #8a8a9a;
+      --violet: #8b5cf6;
+      --fuchsia: #d946ef;
+      --cyan: #22d3ee;
+      --green: #34d399;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body { background: #08080c; color: #fff; overflow-x: hidden; }
-    .bg-grid {
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Mona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-feature-settings: 'ss01', 'ss02';
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+    h1, h2, h3, .technical {
+      font-family: 'Hubot Sans', 'Mona Sans', sans-serif;
+      letter-spacing: -0.02em;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .grid-bg {
+      position: absolute; inset: 0; z-index: -1;
       background-image:
-        linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
-    }
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-    .gradient-text {
-      background: linear-gradient(90deg, #c4b5fd, #f0abfc, #67e8f9);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    .glass {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.1);
-      backdrop-filter: blur(12px);
+        linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 70% 55% at 50% 0%, #000 30%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 0%, #000 30%, transparent 100%);
     }
     .glow {
-      position: absolute;
-      border-radius: 9999px;
-      filter: blur(140px);
-      pointer-events: none;
-      z-index: -1;
+      position: absolute; border-radius: 9999px; filter: blur(150px);
+      pointer-events: none; z-index: -1; opacity: 0.6;
     }
-    .faq-answer { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
-    .faq-answer.open { max-height: 300px; }
-    .faq-chevron { transition: transform .3s ease; }
+    .gradient-text {
+      background: linear-gradient(100deg, #c4b5fd 0%, #f0abfc 45%, #67e8f9 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .glass {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 999px;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+      font-size: 12px; color: var(--muted); backdrop-filter: blur(8px);
+    }
+    .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px 26px; border-radius: 12px;
+      background: #fff; color: #000; font-weight: 600; font-size: 14px;
+      border: none; cursor: pointer; text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .btn-primary:hover { background: #e8e8ed; transform: translateY(-1px); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px 26px; border-radius: 12px;
+      background: rgba(255,255,255,0.04); color: #fff; font-weight: 500; font-size: 14px;
+      border: 1px solid var(--border); cursor: pointer; text-decoration: none;
+      backdrop-filter: blur(8px); transition: background .2s;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.08); }
+    .terminal {
+      background: #0a0a10; border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 12.5px; line-height: 1.8;
+    }
+    .terminal-bar {
+      display: flex; gap: 6px; padding: 12px 14px;
+      border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02);
+    }
+    .terminal-bar span { width: 10px; height: 10px; border-radius: 50%; }
+    .terminal-body { padding: 16px 18px; }
+    .t-keyword { color: #c084fc; }
+    .t-string { color: #86efac; }
+    .t-muted { color: #4a4a5a; }
+    .t-success { color: #34d399; }
+    .t-comment { color: #5a5a6a; font-style: italic; }
+    .stat-num { font-family: 'Hubot Sans', sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
+    .feature-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px; transition: border-color .2s, background .2s;
+    }
+    .feature-card:hover { border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.04); }
+    .icon-box {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: grid; place-items: center;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      margin-bottom: 14px; color: #c4b5fd;
+    }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q {
+      width: 100%; background: none; border: none; color: var(--text);
+      padding: 18px 20px; text-align: left; font-size: 14px; font-weight: 500;
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      font-family: inherit;
+    }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height .3s ease; padding: 0 20px; }
+    .faq-a.open { max-height: 200px; padding-bottom: 18px; }
+    .faq-a p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .faq-chevron { transition: transform .3s; color: var(--muted); flex-shrink: 0; }
     .faq-chevron.open { transform: rotate(180deg); }
-    ::selection { background: rgba(167,139,250,0.35); }
+    .mobile-menu { display: none; }
+    .mobile-menu.open { display: block; }
+    @media (max-width: 768px) {
+      .hide-mobile { display: none !important; }
+      .stack-mobile { flex-direction: column !important; }
+      .stat-num { font-size: 28px; }
+      h1 { font-size: clamp(2rem, 8vw, 3.5rem) !important; }
+      h2 { font-size: clamp(1.5rem, 5vw, 2.2rem) !important; }
+    }
+    ::selection { background: rgba(139,92,246,0.35); }
     ::-webkit-scrollbar { width: 10px; }
-    ::-webkit-scrollbar-track { background: #08080c; }
-    ::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #22222e; border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: #33333f; }
+    .ecosystem-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 6px;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; border: 1px solid var(--border);
+    }
+    .pipeline-node {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 10px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      font-size: 12px; white-space: nowrap;
+    }
+    .pipeline-arrow { color: #33333f; font-size: 16px; }
   </style>
 </head>
-<body class="font-sans antialiased">
+<body>
 
-  <!-- ================= NAVBAR ================= -->
-  <header class="fixed top-0 inset-x-0 z-50">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6">
-      <nav class="mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-black/50 px-4 py-3 backdrop-blur-xl">
-        <a href="#" class="flex items-center gap-2">
-          <div class="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500">
-            <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-          </div>
-          <span class="text-lg font-semibold tracking-tight">Phaxar</span>
-          <span class="ml-1 rounded-md border border-white/10 px-1.5 py-0.5 text-[10px] font-medium text-white/60">by Apaxaa</span>
-        </a>
-
-        <div class="hidden items-center gap-8 md:flex">
-          <a href="#product" class="text-sm text-white/60 transition hover:text-white">Product</a>
-          <a href="#how" class="text-sm text-white/60 transition hover:text-white">How it works</a>
-          <a href="#pricing" class="text-sm text-white/60 transition hover:text-white">Pricing</a>
-          <a href="#developers" class="text-sm text-white/60 transition hover:text-white">Developers</a>
+<!-- ================= NAVBAR ================= -->
+<header style="position: fixed; top: 0; left: 0; right: 0; z-index: 100;">
+  <div class="container" style="padding-top: 14px;">
+    <nav class="glass" style="display: flex; align-items: center; justify-content: space-between; border-radius: 16px; padding: 10px 18px;">
+      <a href="#" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
+        <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #8b5cf6, #d946ef); display: grid; place-items: center;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
         </div>
-
-        <div class="hidden items-center gap-3 md:flex">
-          <a href="/login" class="text-sm text-white/70 transition hover:text-white">Sign in</a>
-          <a href="/new" class="group inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-white/90">
-            Start free
-            <svg class="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-          </a>
-        </div>
-
-        <button id="menuBtn" class="grid h-9 w-9 place-items-center rounded-lg border border-white/10 md:hidden" aria-label="Menu">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-        </button>
-      </nav>
-
-      <div id="mobileMenu" class="mt-2 hidden rounded-2xl border border-white/10 bg-black/90 p-4 backdrop-blur-xl md:hidden">
-        <div class="flex flex-col gap-3">
-          <a href="#product" class="text-sm text-white/70">Product</a>
-          <a href="#how" class="text-sm text-white/70">How it works</a>
-          <a href="#pricing" class="text-sm text-white/70">Pricing</a>
-          <a href="#developers" class="text-sm text-white/70">Developers</a>
-          <a href="/new" class="mt-2 rounded-xl bg-white px-4 py-2 text-center text-sm font-medium text-black">Start free</a>
-        </div>
+        <span style="font-family: 'Hubot Sans'; font-weight: 700; font-size: 17px; letter-spacing: -0.02em;">Phaxar</span>
+        <span style="font-size: 10px; color: var(--muted); border: 1px solid var(--border); border-radius: 5px; padding: 2px 7px; letter-spacing: 0.04em;">by Apaxaa</span>
+      </a>
+      <div class="hide-mobile" style="display: flex; align-items: center; gap: 28px;">
+        <a href="#product" style="font-size: 13px; color: var(--muted); text-decoration: none;">Product</a>
+        <a href="#how" style="font-size: 13px; color: var(--muted); text-decoration: none;">How it works</a>
+        <a href="#pricing" style="font-size: 13px; color: var(--muted); text-decoration: none;">Pricing</a>
+        <a href="#developers" style="font-size: 13px; color: var(--muted); text-decoration: none;">Developers</a>
       </div>
-    </div>
-  </header>
-
-  <!-- ================= HERO ================= -->
-  <section class="relative overflow-hidden pt-36 pb-24 sm:pt-44">
-    <div class="bg-grid absolute inset-0 -z-10"></div>
-    <div class="glow left-1/2 top-0 h-[520px] w-[820px] -translate-x-1/2 bg-violet-600/25"></div>
-    <div class="glow right-1/4 top-40 h-[320px] w-[320px] bg-fuchsia-600/20 animate-pulse-slow"></div>
-    <div class="glow left-1/4 top-60 h-[280px] w-[280px] bg-cyan-500/15"></div>
-
-    <div class="mx-auto max-w-4xl px-4 text-center sm:px-6">
-      <div class="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 backdrop-blur">
-        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-        A product of Apaxaa · Built in Enugu
-      </div>
-
-      <h1 class="text-balance text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
-        Describe a website.
-        <br />
-        <span class="gradient-text">Watch it go live.</span>
-      </h1>
-
-      <p class="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-white/60 sm:text-lg">
-        Phaxar turns a sentence into a deployed website. AI agents build it,
-        infrastructure hosts it, and Rael keeps it safe. Or bring your own code —
-        GitHub, zip, whatever. One platform, three ways to ship.
-      </p>
-
-      <div class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-        <a href="/new" class="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/90 sm:w-auto">
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-          Build my site free
-          <svg class="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-        </a>
-        <a href="#how" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white/10 sm:w-auto">
-          See how it works
+      <div class="hide-mobile" style="display: flex; align-items: center; gap: 12px;">
+        <a href="/login" style="font-size: 13px; color: var(--muted); text-decoration: none;">Sign in</a>
+        <a href="/new" class="btn-primary" style="padding: 9px 18px; font-size: 13px;">Start free
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </a>
       </div>
-
-      <p class="mt-5 text-xs text-white/40">No credit card. 3 free generations. Your first site is live in under a minute.</p>
-    </div>
-
-    <!-- hero mock -->
-    <div class="mx-auto mt-16 max-w-5xl px-4 sm:px-6">
-      <div class="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-2xl shadow-violet-900/20 backdrop-blur animate-float" style="animation-duration: 9s;">
-        <div class="flex items-center gap-2 border-b border-white/10 px-4 py-3">
-          <span class="h-3 w-3 rounded-full bg-red-400/80"></span>
-          <span class="h-3 w-3 rounded-full bg-yellow-400/80"></span>
-          <span class="h-3 w-3 rounded-full bg-green-400/80"></span>
-          <div class="ml-3 flex-1 rounded-md bg-white/5 px-3 py-1 text-[11px] text-white/40">phaxar.xyz / new</div>
-        </div>
-        <div class="grid gap-4 p-5 sm:grid-cols-5 sm:p-6">
-          <div class="sm:col-span-2">
-            <div class="mb-2 text-[11px] uppercase tracking-wider text-white/40">Prompt</div>
-            <div class="rounded-xl border border-white/10 bg-black/40 p-3 text-sm text-white/70">
-              A landing page for my coffee shop in Enugu. Warm colors, menu section, opening hours, and a WhatsApp order button.
-            </div>
-            <div class="mt-3 flex items-center gap-2 text-[11px] text-emerald-300">
-              <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400"></span>
-              Agent generating · validating · deploying…
-            </div>
-          </div>
-          <div class="sm:col-span-3">
-            <div class="mb-2 text-[11px] uppercase tracking-wider text-white/40">Live preview</div>
-            <div class="overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-amber-100 to-orange-200 p-4 text-amber-950">
-              <div class="text-[10px] font-semibold uppercase tracking-widest opacity-60">Enugu Coffee Co.</div>
-              <div class="mt-1 text-xl font-bold leading-tight">Fresh roast. Slow mornings.</div>
-              <div class="mt-3 grid grid-cols-3 gap-2">
-                <div class="rounded-lg bg-white/60 p-2 text-[10px] font-medium">Espresso</div>
-                <div class="rounded-lg bg-white/60 p-2 text-[10px] font-medium">Cold brew</div>
-                <div class="rounded-lg bg-white/60 p-2 text-[10px] font-medium">Pastries</div>
-              </div>
-              <div class="mt-3 inline-flex rounded-md bg-amber-950 px-2 py-1 text-[10px] font-semibold text-white">Order on WhatsApp</div>
-            </div>
-          </div>
-        </div>
+      <button id="menuBtn" class="hide-mobile" style="display: none; background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px; cursor: pointer; color: #fff;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </nav>
+    <div id="mobileMenu" class="mobile-menu glass" style="margin-top: 8px; border-radius: 14px; padding: 16px;">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <a href="#product" style="font-size: 14px; color: var(--muted); text-decoration: none;">Product</a>
+        <a href="#how" style="font-size: 14px; color: var(--muted); text-decoration: none;">How it works</a>
+        <a href="#pricing" style="font-size: 14px; color: var(--muted); text-decoration: none;">Pricing</a>
+        <a href="#developers" style="font-size: 14px; color: var(--muted); text-decoration: none;">Developers</a>
+        <a href="/new" class="btn-primary" style="margin-top: 6px;">Start free</a>
       </div>
     </div>
-  </section>
+  </div>
+</header>
 
-  <!-- ================= THREE PATHS ================= -->
-  <section id="product" class="relative py-24 sm:py-32">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6">
-      <div class="reveal mx-auto max-w-2xl text-center">
-        <div class="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/80">Three ways to ship</div>
-        <h2 class="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">One platform. Every kind of builder.</h2>
-        <p class="mt-4 text-pretty text-white/60">Whether you write code every day or have never opened a terminal, Phaxar meets you where you are.</p>
+<!-- ================= HERO ================= -->
+<section style="position: relative; padding: 160px 0 60px; overflow: hidden;">
+  <div class="grid-bg"></div>
+  <div class="glow" style="left: 50%; top: -80px; width: 700px; height: 500px; transform: translateX(-50%); background: rgba(139,92,246,0.22);"></div>
+  <div class="glow" style="right: 10%; top: 120px; width: 300px; height: 300px; background: rgba(217,70,239,0.16);"></div>
+  <div class="glow" style="left: 8%; top: 200px; width: 260px; height: 260px; background: rgba(34,211,238,0.10);"></div>
+
+  <div class="container" style="text-align: center; position: relative;">
+    <div class="pill" style="margin-bottom: 24px;">
+      <span class="dot"></span>
+      A product of Apaxaa · Built in Enugu · RC 9886261
+    </div>
+
+    <h1 style="font-size: clamp(2.8rem, 6vw, 4.8rem); font-weight: 800; line-height: 1.02; max-width: 900px; margin: 0 auto; letter-spacing: -0.035em;">
+      Describe a website.
+      <br />
+      <span class="gradient-text">Watch it go live.</span>
+    </h1>
+
+    <p style="max-width: 620px; margin: 24px auto 0; font-size: 16px; line-height: 1.7; color: var(--muted);">
+      Phaxar turns a sentence into a deployed website. AI agents build it,
+      infrastructure hosts it, and <strong style="color:#c4b5fd;">Rael</strong> keeps it safe.
+      Or bring your own code — GitHub, zip, whatever. One platform, three ways to ship.
+    </p>
+
+    <div style="display: flex; gap: 12px; justify-content: center; margin-top: 36px; flex-wrap: wrap;">
+      <a href="/new" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+        Build my site free
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+      <a href="#how" class="btn-ghost">See how it works</a>
+    </div>
+
+    <p style="margin-top: 18px; font-size: 12px; color: #5a5a6a;">
+      No credit card · 3 free generations · First site live in under a minute
+    </p>
+  </div>
+
+  <!-- Hero terminal mock -->
+  <div class="container" style="margin-top: 56px; max-width: 900px;">
+    <div class="terminal" style="box-shadow: 0 40px 120px rgba(139,92,246,0.12);">
+      <div class="terminal-bar">
+        <span style="background:#ff5f57;"></span>
+        <span style="background:#febc2e;"></span>
+        <span style="background:#28c840;"></span>
+        <span style="margin-left: 12px; font-size: 11px; color: #4a4a5a; font-family: 'Mona Sans';">phaxar.xyz / new</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-comment">// user prompt</span></div>
+        <div><span class="t-string">"A landing page for my coffee shop in Enugu. Warm colors, menu, hours, WhatsApp button."</span></div>
+        <div style="margin-top: 14px;"><span class="t-keyword">→</span> Agent generating… <span class="t-muted">(claude-sonnet-5)</span></div>
+        <div><span class="t-keyword">→</span> Validating in sandbox… <span class="t-success">✓ secure</span></div>
+        <div><span class="t-keyword">→</span> Building static site… <span class="t-success">done in 4.2s</span></div>
+        <div><span class="t-keyword">→</span> Deploying to edge network…</div>
+        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <span class="t-success">✓ Live at https://enugu-coffee.phaxar.xyz</span>
+        </div>
+        <div class="t-muted">SSL issued · Rael scan passed · 0 vulnerabilities</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="container" style="margin-top: 64px; max-width: 800px;">
+    <div class="glass" style="border-radius: 16px; padding: 28px 20px; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
+      <div style="text-align: center;">
+        <div class="stat-num gradient-text">60s</div>
+        <div class="stat-label">Prompt to live</div>
+      </div>
+      <div style="width: 1px; background: var(--border);" class="hide-mobile"></div>
+      <div style="text-align: center;">
+        <div class="stat-num gradient-text">3</div>
+        <div class="stat-label">Deploy paths</div>
+      </div>
+      <div style="width: 1px; background: var(--border);" class="hide-mobile"></div>
+      <div style="text-align: center;">
+        <div class="stat-num gradient-text">100%</div>
+        <div class="stat-label">Free SSL</div>
+      </div>
+      <div style="width: 1px; background: var(--border);" class="hide-mobile"></div>
+      <div style="text-align: center;">
+        <div class="stat-num gradient-text">₦0</div>
+        <div class="stat-label">To start</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PIPELINE VISUAL ================= -->
+<section style="padding: 80px 0; position: relative;">
+  <div class="container">
+    <div class="reveal" style="text-align: center; margin-bottom: 48px;">
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #a78bfa; margin-bottom: 12px;">Under the hood</div>
+      <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700;">Every deploy follows the same pipeline.</h2>
+      <p style="color: var(--muted); font-size: 14px; margin-top: 10px; max-width: 500px; margin-left: auto; margin-right: auto;">Whether it came from a prompt, a repo, or a zip — the path to production is identical.</p>
+    </div>
+
+    <div class="reveal" style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 0 20px;">
+      <div class="pipeline-node"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg> Prompt / Repo / Zip</div>
+      <span class="pipeline-arrow">→</span>
+      <div class="pipeline-node"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Sandbox validate</div>
+      <span class="pipeline-arrow">→</span>
+      <div class="pipeline-node"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Build</div>
+      <span class="pipeline-arrow">→</span>
+      <div class="pipeline-node"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg> Edge deploy</div>
+      <span class="pipeline-arrow">→</span>
+      <div class="pipeline-node" style="border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.06);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg> Live URL</div>
+    </div>
+
+    <div class="reveal" style="text-align: center; margin-top: 32px; display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; font-size: 11px; color: #5a5a6a;">
+      <span>✓ SSL auto-issued</span>
+      <span>✓ Rael security scan</span>
+      <span>✓ Global CDN</span>
+      <span>✓ Custom domain ready</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= THREE PATHS ================= -->
+<section id="product" style="padding: 100px 0; position: relative;">
+  <div class="container">
+    <div class="reveal" style="text-align: center; margin-bottom: 56px;">
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #a78bfa; margin-bottom: 12px;">Three ways to ship</div>
+      <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700;">One platform. Every kind of builder.</h2>
+      <p style="color: var(--muted); font-size: 14px; margin-top: 10px; max-width: 520px; margin-left: auto; margin-right: auto;">Whether you write code every day or have never opened a terminal, Phaxar meets you where you are.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+      <!-- AI -->
+      <div class="reveal feature-card" style="position: relative;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+          <div class="icon-box" style="margin-bottom: 0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M12 8V4M8 4h8"/><circle cx="8.5" cy="14" r="1" fill="currentColor"/><circle cx="15.5" cy="14" r="1" fill="currentColor"/></svg>
+          </div>
+          <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 3px 8px; border-radius: 5px;">AI Agent</span>
+        </div>
+        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">Describe it. Ship it.</h3>
+        <p style="font-size: 13px; color: var(--muted); line-height: 1.7;">Tell Phaxar what you want in plain English. Our AI agent writes the code, validates it in a sandbox, and deploys it live — in under 60 seconds.</p>
+        <div style="margin-top: 16px; font-size: 12px; color: #a78bfa; opacity: 0; transition: opacity .2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">Powered by Claude Sonnet 5 →</div>
       </div>
 
-      <div class="mt-14 grid gap-5 md:grid-cols-3">
-        <!-- card 1 -->
-        <div class="reveal group relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-white/20 hover:bg-white/[0.05]">
-          <div class="mb-5 inline-flex items-center gap-2">
-            <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 text-violet-200 ring-1 ring-white/10">
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M12 8V4M8 4h8"/><circle cx="8.5" cy="14" r="1" fill="currentColor"/><circle cx="15.5" cy="14" r="1" fill="currentColor"/></svg>
-            </div>
-            <span class="rounded-md border border-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white/50">AI Agent</span>
+      <!-- GitHub -->
+      <div class="reveal feature-card" style="position: relative;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+          <div class="icon-box" style="margin-bottom: 0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
           </div>
-          <h3 class="text-lg font-semibold">Describe it. Ship it.</h3>
-          <p class="mt-2 text-sm leading-relaxed text-white/60">Tell Phaxar what you want in plain English. Our AI agent writes the code, validates it in a sandbox, and deploys it live — in under 60 seconds.</p>
-          <div class="mt-5 inline-flex items-center gap-1 text-sm text-violet-300 opacity-0 transition group-hover:opacity-100">Learn more →</div>
+          <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 3px 8px; border-radius: 5px;">GitHub</span>
         </div>
+        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">Bring your repo.</h3>
+        <p style="font-size: 13px; color: var(--muted); line-height: 1.7;">Already have a codebase? Connect GitHub with a read-only token. We build and deploy on every push. No Vercel account needed.</p>
+        <div style="margin-top: 16px; font-size: 12px; color: #a78bfa; opacity: 0; transition: opacity .2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">Read-only token · <24h expiry →</div>
+      </div>
 
-        <!-- card 2 -->
-        <div class="reveal group relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-white/20 hover:bg-white/[0.05]">
-          <div class="mb-5 inline-flex items-center gap-2">
-            <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 text-violet-200 ring-1 ring-white/10">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
-            </div>
-            <span class="rounded-md border border-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white/50">GitHub</span>
+      <!-- Manual -->
+      <div class="reveal feature-card" style="position: relative;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+          <div class="icon-box" style="margin-bottom: 0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16a4 4 0 01-.88-7.9A5 5 0 1115.9 6h.1a5 5 0 011.9 9.6M12 12v9m0-9l-3 3m3-3l3 3"/></svg>
           </div>
-          <h3 class="text-lg font-semibold">Bring your repo.</h3>
-          <p class="mt-2 text-sm leading-relaxed text-white/60">Already have a codebase? Connect GitHub with a read-only token. We build and deploy on every push. No Vercel account needed.</p>
-          <div class="mt-5 inline-flex items-center gap-1 text-sm text-violet-300 opacity-0 transition group-hover:opacity-100">Learn more →</div>
+          <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 3px 8px; border-radius: 5px;">Manual</span>
         </div>
+        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">Drop your files.</h3>
+        <p style="font-size: 13px; color: var(--muted); line-height: 1.7;">No Git? No problem. Drag a folder or a zip. We handle the build, SSL, CDN, and give you a live link instantly.</p>
+        <div style="margin-top: 16px; font-size: 12px; color: #a78bfa; opacity: 0; transition: opacity .2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">Zip, folder, or single HTML file →</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <!-- card 3 -->
-        <div class="reveal group relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-white/20 hover:bg-white/[0.05]">
-          <div class="mb-5 inline-flex items-center gap-2">
-            <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 text-violet-200 ring-1 ring-white/10">
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.9A5 5 0 1115.9 6h.1a5 5 0 011.9 9.6M12 12v9m0-9l-3 3m3-3l3 3"/></svg>
-            </div>
-            <span class="rounded-md border border-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white/50">Manual</span>
-          </div>
-          <h3 class="text-lg font-semibold">Drop your files.</h3>
-          <p class="mt-2 text-sm leading-relaxed text-white/60">No Git? No problem. Drag a folder or a zip. We handle the build, SSL, CDN, and give you a live link instantly.</p>
-          <div class="mt-5 inline-flex items-center gap-1 text-sm text-violet-300 opacity-0 transition group-hover:opacity-100">Learn more →</div>
+<!-- ================= WHAT SHIPS WITH EVERY SITE ================= -->
+<section style="padding: 40px 0 80px;">
+  <div class="container">
+    <div class="reveal glass" style="border-radius: 18px; padding: 28px 24px;">
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; text-align: center;">Ships with every site, on every plan</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 18px; text-align: center;">
+        <div>
+          <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Automatic SSL</div>
+          <div style="font-size: 11px; color: var(--muted);">HTTPS, zero config</div>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Global CDN</div>
+          <div style="font-size: 11px; color: var(--muted);">Fast from Lagos to London</div>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Rael security scan</div>
+          <div style="font-size: 11px; color: var(--muted);">Before every deploy</div>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Free subdomain</div>
+          <div style="font-size: 11px; color: var(--muted);">yourname.phaxar.xyz</div>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Instant rollback</div>
+          <div style="font-size: 11px; color: var(--muted);">One click, any deploy</div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ================= FEATURES ================= -->
-  <section id="how" class="relative py-24 sm:py-32">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6">
-      <div class="grid gap-14 lg:grid-cols-2 lg:items-center">
-        <div class="reveal">
-          <div class="text-xs font-medium uppercase tracking-[0.2em] text-cyan-300/80">Why Phaxar</div>
-          <h2 class="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Infrastructure-grade hosting,<br />without the infrastructure.</h2>
-          <p class="mt-4 max-w-lg text-pretty text-white/60">Every site on Phaxar runs on the same edge network that powers some of the world's largest platforms. You get the performance without the ops.</p>
-        </div>
-
-        <div class="grid gap-4 sm:grid-cols-2">
-          <div class="reveal h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-            <div class="mb-3 grid h-9 w-9 place-items-center rounded-lg bg-white/5 text-white/80 ring-1 ring-white/10">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            </div>
-            <h3 class="text-sm font-semibold">Live in 60 seconds</h3>
-            <p class="mt-1.5 text-xs leading-relaxed text-white/55">From prompt to production URL. No DNS wait, no config files, no cold starts.</p>
-          </div>
-
-          <div class="reveal h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-            <div class="mb-3 grid h-9 w-9 place-items-center rounded-lg bg-white/5 text-white/80 ring-1 ring-white/10">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>
-            </div>
-            <h3 class="text-sm font-semibold">Free subdomain, forever</h3>
-            <p class="mt-1.5 text-xs leading-relaxed text-white/55">Every project gets yourname.phaxar.xyz with automatic SSL. Upgrade only when you want your own domain.</p>
-          </div>
-
-          <div class="reveal h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-            <div class="mb-3 grid h-9 w-9 place-items-center rounded-lg bg-white/5 text-white/80 ring-1 ring-white/10">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <h3 class="text-sm font-semibold">Secured by Rael</h3>
-            <p class="mt-1.5 text-xs leading-relaxed text-white/55">Every site is scanned by Apaxaa's fraud and protection engine before it goes live.</p>
-          </div>
-
-          <div class="reveal h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-            <div class="mb-3 grid h-9 w-9 place-items-center rounded-lg bg-white/5 text-white/80 ring-1 ring-white/10">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
-            </div>
-            <h3 class="text-sm font-semibold">Developer escape hatch</h3>
-            <p class="mt-1.5 text-xs leading-relaxed text-white/55">Full Git workflow, environment variables, and preview deployments when you need control.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= PRICING ================= -->
-  <section id="pricing" class="relative py-24 sm:py-32">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6">
-      <div class="reveal mx-auto max-w-2xl text-center">
-        <div class="text-xs font-medium uppercase tracking-[0.2em] text-fuchsia-300/80">Pricing</div>
-        <h2 class="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Start free. Upgrade when it ships.</h2>
-        <p class="mt-4 text-pretty text-white/60">Naira pricing, no FX surprises. Cancel anytime.</p>
-      </div>
-
-      <div class="mt-14 grid gap-5 lg:grid-cols-3">
-        <!-- starter -->
-        <div class="reveal relative flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <div class="text-sm font-medium text-white/70">Starter</div>
-          <div class="mt-2 flex items-end gap-1">
-            <span class="text-4xl font-semibold tracking-tight">₦0</span>
-            <span class="mb-1 text-xs text-white/50">forever</span>
-          </div>
-          <p class="mt-2 text-xs text-white/50">For trying the magic.</p>
-          <ul class="mt-6 flex-1 space-y-2.5 text-sm text-white/70">
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>3 AI generations / month</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>1 project</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Free phaxar.xyz subdomain</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Automatic SSL</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Rael security scan</span></li>
-          </ul>
-          <a href="/new" class="mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium transition hover:bg-white/10">Start free →</a>
-        </div>
-
-        <!-- builder -->
-        <div class="reveal relative flex h-full flex-col rounded-2xl border border-violet-400/40 bg-gradient-to-b from-violet-500/[0.08] to-transparent p-6 shadow-lg shadow-violet-900/20">
-          <div class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">Most popular</div>
-          <div class="text-sm font-medium text-white/70">Builder</div>
-          <div class="mt-2 flex items-end gap-1">
-            <span class="text-4xl font-semibold tracking-tight">₦4,500</span>
-            <span class="mb-1 text-xs text-white/50">/ month</span>
-          </div>
-          <p class="mt-2 text-xs text-white/50">For people shipping real sites.</p>
-          <ul class="mt-6 flex-1 space-y-2.5 text-sm text-white/70">
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>50 AI generations / month</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>10 projects</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Custom domain support</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>GitHub + manual deploy</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Priority build queue</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Email support</span></li>
-          </ul>
-          <a href="/checkout?plan=builder" class="mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-white/90">Upgrade to Builder →</a>
-        </div>
-
-        <!-- studio -->
-        <div class="reveal relative flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <div class="text-sm font-medium text-white/70">Studio</div>
-          <div class="mt-2 flex items-end gap-1">
-            <span class="text-4xl font-semibold tracking-tight">₦15,000</span>
-            <span class="mb-1 text-xs text-white/50">/ month</span>
-          </div>
-          <p class="mt-2 text-xs text-white/50">For agencies and teams.</p>
-          <ul class="mt-6 flex-1 space-y-2.5 text-sm text-white/70">
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Unlimited AI generations</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Unlimited projects</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Custom domains + DNS</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Team seats (up to 5)</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Rael deep scan + reports</span></li>
-            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Dedicated support</span></li>
-          </ul>
-          <a href="mailto:hello@apaxaa.com" class="mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium transition hover:bg-white/10">Talk to us →</a>
+<!-- ================= FEATURES ================= -->
+<section id="how" style="padding: 80px 0 100px;">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px; align-items: center;">
+      <div class="reveal">
+        <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #67e8f9; margin-bottom: 12px;">Why Phaxar</div>
+        <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700; line-height: 1.15;">Infrastructure-grade hosting,<br/>without the infrastructure.</h2>
+        <p style="color: var(--muted); font-size: 14px; line-height: 1.7; margin-top: 14px; max-width: 440px;">Every site on Phaxar runs on the same edge network that powers some of the world's largest platforms. You get the performance without the ops.</p>
+        <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px; font-size: 12.5px; color: var(--muted);">
+          <div style="display: flex; align-items: center; gap: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg> Environment variables, encrypted at rest</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg> Build logs streamed in real time</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg> Preview deployments for every branch</div>
         </div>
       </div>
 
-      <p class="reveal mt-8 text-center text-xs text-white/40">All plans include automatic SSL, free phaxar.xyz subdomain, and Rael security scanning. VAT added where applicable.</p>
-    </div>
-  </section>
-
-  <!-- ================= DEVELOPERS ================= -->
-  <section id="developers" class="relative py-24 sm:py-32">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6">
-      <div class="reveal relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.01] p-8 sm:p-12">
-        <div class="glow -right-20 -top-20 h-64 w-64 bg-violet-500/25"></div>
-        <div class="grid gap-8 lg:grid-cols-2 lg:items-center">
+      <div style="display: grid; gap: 14px;">
+        <div class="reveal feature-card" style="display: flex; gap: 16px; align-items: flex-start;">
+          <div class="icon-box" style="flex-shrink: 0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
           <div>
-            <div class="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/80">For developers</div>
-            <h2 class="mt-3 text-balance text-3xl font-semibold tracking-tight">Your workflow, unchanged.</h2>
-            <p class="mt-3 max-w-md text-pretty text-white/60">Connect GitHub, push to main, get a preview URL. Environment variables, build logs, rollbacks — the things you already expect, on infrastructure built for Africa.</p>
-            <div class="mt-6 flex flex-wrap gap-3">
-              <a href="/docs" class="inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-black hover:bg-white/90">Read the docs →</a>
-              <a href="https://github.com" class="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium hover:bg-white/10">
-                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
-                View on GitHub
-              </a>
-            </div>
-          </div>
-
-          <div class="rounded-xl border border-white/10 bg-black/50 p-4 font-mono text-[12px] leading-relaxed text-white/70">
-            <div class="mb-2 flex gap-1.5">
-              <span class="h-2.5 w-2.5 rounded-full bg-red-400/70"></span>
-              <span class="h-2.5 w-2.5 rounded-full bg-yellow-400/70"></span>
-              <span class="h-2.5 w-2.5 rounded-full bg-green-400/70"></span>
-            </div>
-            <div><span class="text-violet-300">$</span> npx phaxar deploy</div>
-            <div class="text-white/40">→ Detected Next.js 14</div>
-            <div class="text-white/40">→ Installing dependencies…</div>
-            <div class="text-white/40">→ Building… done in 12.4s</div>
-            <div class="text-emerald-300">✓ Deployed to https://myapp.phaxar.xyz</div>
-            <div class="text-white/40">→ SSL issued · Rael scan passed</div>
+            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Live in 60 seconds</h3>
+            <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">From prompt to production URL. No DNS wait, no config files, no cold starts.</p>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ================= FAQ ================= -->
-  <section class="relative py-24 sm:py-32">
-    <div class="mx-auto max-w-3xl px-4 sm:px-6">
-      <div class="reveal text-center">
-        <h2 class="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Questions, answered.</h2>
-      </div>
-
-      <div class="reveal mt-10 divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[0.02]">
-        <div>
-          <button class="faq-btn flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
-            <span class="text-sm font-medium">Do I need to know how to code?</span>
-            <svg class="faq-chevron h-4 w-4 shrink-0 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-          <div class="faq-answer px-5 text-sm leading-relaxed text-white/60"><p class="pb-4">No. Describe your site in plain English and Phaxar builds it. If you do code, you can connect GitHub or upload files directly.</p></div>
-        </div>
-
-        <div>
-          <button class="faq-btn flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
-            <span class="text-sm font-medium">Where are the sites hosted?</span>
-            <svg class="faq-chevron h-4 w-4 shrink-0 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-          <div class="faq-answer px-5 text-sm leading-relaxed text-white/60"><p class="pb-4">On Phaxar's edge network, built on Vercel infrastructure, with data residency options in Nigeria through our infrastructure partners.</p></div>
-        </div>
-
-        <div>
-          <button class="faq-btn flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
-            <span class="text-sm font-medium">Can I use my own domain?</span>
-            <svg class="faq-chevron h-4 w-4 shrink-0 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-          <div class="faq-answer px-5 text-sm leading-relaxed text-white/60"><p class="pb-4">Yes. On the Builder plan and above, you can attach any domain you own. We handle DNS verification and SSL automatically.</p></div>
-        </div>
-
-        <div>
-          <button class="faq-btn flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
-            <span class="text-sm font-medium">What happens if I hit my generation limit?</span>
-            <svg class="faq-chevron h-4 w-4 shrink-0 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-          <div class="faq-answer px-5 text-sm leading-relaxed text-white/60"><p class="pb-4">You can upgrade at any time. Unused generations do not roll over, but your existing sites stay live.</p></div>
-        </div>
-
-        <div>
-          <button class="faq-btn flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
-            <span class="text-sm font-medium">Is Phaxar a product of Apaxaa?</span>
-            <svg class="faq-chevron h-4 w-4 shrink-0 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-          <div class="faq-answer px-5 text-sm leading-relaxed text-white/60"><p class="pb-4">Yes. Phaxar is built and operated by Apaxaa Technologies Ltd (RC 9886261), the same team behind Joyet, Candleben, and Rael.</p></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= FINAL CTA ================= -->
-  <section class="relative py-24 sm:py-32">
-    <div class="mx-auto max-w-4xl px-4 sm:px-6">
-      <div class="reveal relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-violet-600/20 via-fuchsia-600/10 to-cyan-500/10 p-10 text-center sm:p-16">
-        <div class="glow left-1/2 top-0 h-64 w-64 -translate-x-1/2 bg-violet-500/30"></div>
-        <h2 class="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Your next website starts with a sentence.</h2>
-        <p class="mx-auto mt-4 max-w-lg text-pretty text-white/60">Join the builders shipping on Phaxar. Free to start, live in seconds, owned by you.</p>
-        <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <a href="/new" class="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/90 sm:w-auto">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-            Build my site free
-            <svg class="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-          </a>
-          <a href="mailto:hello@apaxaa.com" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium backdrop-blur transition hover:bg-white/10 sm:w-auto">Talk to us</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= FOOTER ================= -->
-  <footer class="border-t border-white/10 py-14">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6">
-      <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-        <div>
-          <div class="flex items-center gap-2">
-            <div class="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500">
-              <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-            </div>
-            <span class="text-lg font-semibold">Phaxar</span>
+        <div class="reveal feature-card" style="display: flex; gap: 16px; align-items: flex-start;">
+          <div class="icon-box" style="flex-shrink: 0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>
           </div>
-          <p class="mt-3 max-w-xs text-xs leading-relaxed text-white/50">A product of Apaxaa Technologies Ltd. Engineering the future of technology, from Enugu to everywhere.</p>
+          <div>
+            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Free subdomain, forever</h3>
+            <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">Every project gets yourname.phaxar.xyz with automatic SSL. Upgrade only when you want your own domain.</p>
+          </div>
         </div>
 
-        <div>
-          <div class="text-xs font-semibold uppercase tracking-wider text-white/40">Product</div>
-          <ul class="mt-3 space-y-2 text-sm text-white/60">
-            <li><a href="/new" class="hover:text-white">AI builder</a></li>
-            <li><a href="/docs" class="hover:text-white">Docs</a></li>
-            <li><a href="#pricing" class="hover:text-white">Pricing</a></li>
-            <li><a href="#" class="hover:text-white">Status</a></li>
-          </ul>
+        <div class="reveal feature-card" style="display: flex; gap: 16px; align-items: flex-start;">
+          <div class="icon-box" style="flex-shrink: 0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Secured by Rael</h3>
+            <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">Every site is scanned by Apaxaa's fraud and protection engine before it goes live.</p>
+          </div>
         </div>
 
-        <div>
-          <div class="text-xs font-semibold uppercase tracking-wider text-white/40">Company</div>
-          <ul class="mt-3 space-y-2 text-sm text-white/60">
-            <li><a href="https://apaxaa.com" class="hover:text-white">Apaxaa</a></li>
-            <li><a href="https://apaxaa.com/companies" class="hover:text-white">Companies</a></li>
-            <li><a href="https://apaxaa.com/careers" class="hover:text-white">Careers</a></li>
-            <li><a href="mailto:hello@apaxaa.com" class="hover:text-white">Contact</a></li>
-          </ul>
+        <div class="reveal feature-card" style="display: flex; gap: 16px; align-items: flex-start;">
+          <div class="icon-box" style="flex-shrink: 0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+          </div>
+          <div>
+            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Developer escape hatch</h3>
+            <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">Full Git workflow, environment variables, and preview deployments when you need control.</p>
+          </div>
         </div>
-
-        <div>
-          <div class="text-xs font-semibold uppercase tracking-wider text-white/40">Legal</div>
-          <ul class="mt-3 space-y-2 text-sm text-white/60">
-            <li><a href="/privacy" class="hover:text-white">Privacy</a></li>
-            <li><a href="/terms" class="hover:text-white">Terms</a></li>
-            <li><a href="/dpa" class="hover:text-white">DPA</a></li>
-            <li><a href="/imprint" class="hover:text-white">Imprint</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center">
-        <p class="text-xs text-white/40">© 2026 Apaxaa Technologies Ltd · RC 9886261. All rights reserved.</p>
-        <p class="text-xs text-white/40">Phaxar — engineering the future of technology.</p>
       </div>
     </div>
-  </footer>
+  </div>
+</section>
 
-  <!-- ================= SCRIPTS ================= -->
-  <script>
-    // Mobile menu toggle
-    const menuBtn = document.getElementById('menuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+<!-- ================= ECOSYSTEM ================= -->
+<section style="padding: 60px 0 100px;">
+  <div class="container">
+    <div class="reveal" style="text-align: center; margin-bottom: 40px;">
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #a78bfa; margin-bottom: 12px;">Part of something bigger</div>
+      <h2 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700;">Built inside the Apaxaa ecosystem.</h2>
+      <p style="color: var(--muted); font-size: 14px; margin-top: 8px;">Phaxar doesn't stand alone. It plugs into the products Apaxaa already runs.</p>
+    </div>
 
-    // Scroll reveal
-    const reveals = document.querySelectorAll('.reveal');
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
-    reveals.forEach((el) => revealObserver.observe(el));
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+      <div class="reveal glass" style="border-radius: 14px; padding: 20px; text-align: center;">
+        <div class="ecosystem-badge" style="margin-bottom: 10px; border-color: rgba(139,92,246,0.3); color: #c4b5fd;">Rael</div>
+        <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">Fraud & protection engine. Every Phaxar site is scanned before it goes live.</div>
+      </div>
+      <div class="reveal glass" style="border-radius: 14px; padding: 20px; text-align: center;">
+        <div class="ecosystem-badge" style="margin-bottom: 10px; border-color: rgba(52,211,153,0.3); color: #6ee7b7;">Joyet</div>
+        <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">Crypto fintech. Sites built on Phaxar can integrate Joyet payments.</div>
+      </div>
+      <div class="reveal glass" style="border-radius: 14px; padding: 20px; text-align: center;">
+        <div class="ecosystem-badge" style="margin-bottom: 10px; border-color: rgba(34,211,238,0.3); color: #67e8f9;">Candleben</div>
+        <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">Trading technology. Dashboards and data pages ship faster on Phaxar.</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    // FAQ accordion
-    document.querySelectorAll('.faq-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const answer = btn.nextElementSibling;
-        const chevron = btn.querySelector('.faq-chevron');
-        const isOpen = answer.classList.contains('open');
-        // close all
-        document.querySelectorAll('.faq-answer').forEach((a) => a.classList.remove('open'));
-        document.querySelectorAll('.faq-chevron').forEach((c) => c.classList.remove('open'));
-        // open clicked if it was closed
-        if (!isOpen) {
-          answer.classList.add('open');
-          chevron.classList.add('open');
-        }
-      });
+<!-- ================= PRICING ================= -->
+<section id="pricing" style="padding: 100px 0;">
+  <div class="container">
+    <div class="reveal" style="text-align: center; margin-bottom: 56px;">
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #d946ef; margin-bottom: 12px;">Pricing</div>
+      <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700;">Start free. Upgrade when it ships.</h2>
+      <p style="color: var(--muted); font-size: 14px; margin-top: 10px;">Naira pricing, no FX surprises. Cancel anytime.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; align-items: stretch;">
+      <!-- Starter -->
+      <div class="reveal glass" style="border-radius: 18px; padding: 28px 24px; display: flex; flex-direction: column;">
+        <div style="font-size: 13px; font-weight: 600; color: #c4b5fd;">Starter</div>
+        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 6px;">
+          <span style="font-family: 'Hubot Sans'; font-size: 38px; font-weight: 700; letter-spacing: -0.03em;">₦0</span>
+          <span style="font-size: 12px; color: var(--muted);">forever</span>
+        </div>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 6px;">For trying the magic.</p>
+        <ul style="list-style: none; margin-top: 22px; flex: 1; display: flex; flex-direction: column; gap: 10px;">
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> 3 AI generations / month</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> 1 project</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Free phaxar.xyz subdomain</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Automatic SSL</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Rael security scan</li>
+        </ul>
+        <a href="/new" class="btn-ghost" style="margin-top: 24px; width: 100%; font-size: 13px; padding: 11px;">Start free →</a>
+      </div>
+
+      <!-- Builder -->
+      <div class="reveal" style="border-radius: 18px; padding: 28px 24px; display: flex; flex-direction: column; border: 1px solid rgba(139,92,246,0.35); background: linear-gradient(180deg, rgba(139,92,246,0.06), transparent); position: relative;">
+        <div style="position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, #8b5cf6, #d946ef); padding: 4px 14px; border-radius: 999px; font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; white-space: nowrap;">Most popular</div>
+        <div style="font-size: 13px; font-weight: 600; color: #c4b5fd;">Builder</div>
+        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 6px;">
+          <span style="font-family: 'Hubot Sans'; font-size: 38px; font-weight: 700; letter-spacing: -0.03em;">₦4,500</span>
+          <span style="font-size: 12px; color: var(--muted);">/ month</span>
+        </div>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 6px;">For people shipping real sites.</p>
+        <ul style="list-style: none; margin-top: 22px; flex: 1; display: flex; flex-direction: column; gap: 10px;">
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> 50 AI generations / month</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> 10 projects</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Custom domain support</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> GitHub + manual deploy</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Priority build queue</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Email support</li>
+        </ul>
+        <a href="/checkout?plan=builder" class="btn-primary" style="margin-top: 24px; width: 100%; font-size: 13px; padding: 11px;">Upgrade to Builder →</a>
+      </div>
+
+      <!-- Studio -->
+      <div class="reveal glass" style="border-radius: 18px; padding: 28px 24px; display: flex; flex-direction: column;">
+        <div style="font-size: 13px; font-weight: 600; color: #c4b5fd;">Studio</div>
+        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 6px;">
+          <span style="font-family: 'Hubot Sans'; font-size: 38px; font-weight: 700; letter-spacing: -0.03em;">₦15,000</span>
+          <span style="font-size: 12px; color: var(--muted);">/ month</span>
+        </div>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 6px;">For agencies and teams.</p>
+        <ul style="list-style: none; margin-top: 22px; flex: 1; display: flex; flex-direction: column; gap: 10px;">
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Unlimited AI generations</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Unlimited projects</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Custom domains + DNS</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Team seats (up to 5)</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Rael deep scan + reports</li>
+          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Dedicated support</li>
+        </ul>
+        <a href="mailto:hello@apaxaa.com" class="btn-ghost" style="margin-top: 24px; width: 100%; font-size: 13px; padding: 11px;">Talk to us →</a>
+      </div>
+    </div>
+
+    <p class="reveal" style="text-align: center; font-size: 11px; color: #4a4a5a; margin-top: 28px;">All plans include automatic SSL, free phaxar.xyz subdomain, and Rael security scanning. VAT added where applicable.</p>
+  </div>
+</section>
+
+<!-- ================= DEVELOPERS ================= -->
+<section id="developers" style="padding: 40px 0 100px;">
+  <div class="container">
+    <div class="reveal" style="border-radius: 24px; border: 1px solid var(--border); background: linear-gradient(135deg, rgba(139,92,246,0.06), rgba(34,211,238,0.03)); padding: 40px 32px; position: relative; overflow: hidden;">
+      <div class="glow" style="right: -60px; top: -60px; width: 220px; height: 220px; background: rgba(139,92,246,0.2);"></div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 36px; align-items: center; position: relative;">
+        <div>
+          <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #a78bfa; margin-bottom: 12px;">For developers</div>
+          <h2 style="font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; line-height: 1.15;">Your workflow, unchanged.</h2>
+          <p style="color: var(--muted); font-size: 14px; line-height: 1.7; margin-top: 12px; max-width: 420px;">Connect GitHub, push to main, get a preview URL. Environment variables, build logs, rollbacks — the things you already expect, on infrastructure built for Africa.</p>
+          <div style="display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap;">
+            <a href="/docs" class="btn-primary" style="font-size: 13px; padding: 11px 20px;">Read the docs →</a>
+            <a href="https://github.com" class="btn-ghost" style="font-size: 13px; padding: 11px 20px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+              View on GitHub
+            </a>
+          </div>
+        </div>
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span style="background:#ff5f57;"></span><span style="background:#febc2e;"></span><span style="background:#28c840;"></span>
+            <span style="margin-left: 12px; font-size: 11px; color: #4a4a5a; font-family: 'Mona Sans';">terminal</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="t-comment"># deploy from CLI</span></div>
+            <div><span class="t-keyword">$</span> npx phaxar deploy</div>
+            <div style="margin-top: 6px;"><span class="t-keyword">→</span> Detected Next.js 14</div>
+            <div><span class="t-keyword">→</span> Installing dependencies…</div>
+            <div><span class="t-keyword">→</span> Building… <span class="t-success">done in 12.4s</span></div>
+            <div style="margin-top: 6px;"><span class="t-success">✓ Deployed to https://myapp.phaxar.xyz</span></div>
+            <div><span class="t-keyword">→</span> SSL issued · Rael scan passed</div>
+            <div style="margin-top: 6px;"><span class="t-comment"># rollback in one command</span></div>
+            <div><span class="t-keyword">$</span> npx phaxar rollback <span class="t-string">--to</span> previous</div>
+            <div><span class="t-success">✓ Restored in 0.8s</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section style="padding: 80px 0 100px;">
+  <div class="container" style="max-width: 680px;">
+    <div class="reveal" style="text-align: center; margin-bottom: 40px;">
+      <h2 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700;">Questions, answered.</h2>
+    </div>
+
+    <div class="reveal glass" style="border-radius: 16px; overflow: hidden;">
+      <div class="faq-item">
+        <button class="faq-q">Do I need to know how to code?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-a"><p>No. Describe your site in plain English and Phaxar builds it. If you do code, you can connect GitHub or upload files directly.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Where are the sites hosted?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-a"><p>On Phaxar's edge network, built on Vercel infrastructure, with data residency options in Nigeria through our infrastructure partners.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Can I use my own domain?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-a"><p>Yes. On the Builder plan and above, you can attach any domain you own. We handle DNS verification and SSL automatically.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">What happens if I hit my generation limit?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-a"><p>You can upgrade at any time. Unused generations do not roll over, but your existing sites stay live.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Is Phaxar a product of Apaxaa?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-a"><p>Yes. Phaxar is built and operated by Apaxaa Technologies Ltd (RC 9886261), the same team behind Joyet, Candleben, and Rael.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FINAL CTA ================= -->
+<section style="padding: 40px 0 100px;">
+  <div class="container" style="max-width: 720px;">
+    <div class="reveal" style="border-radius: 24px; border: 1px solid var(--border); background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(217,70,239,0.06), rgba(34,211,238,0.04)); padding: 52px 32px; text-align: center; position: relative; overflow: hidden;">
+      <div class="glow" style="left: 50%; top: -40px; width: 300px; height: 200px; transform: translateX(-50%); background: rgba(139,92,246,0.25);"></div>
+      <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700; line-height: 1.15; position: relative;">Your next website starts with a sentence.</h2>
+      <p style="color: var(--muted); font-size: 14px; margin-top: 12px; position: relative;">Join the builders shipping on Phaxar. Free to start, live in seconds, owned by you.</p>
+      <div style="display: flex; gap: 12px; justify-content: center; margin-top: 28px; flex-wrap: wrap; position: relative;">
+        <a href="/new" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          Build my site free
+        </a>
+        <a href="mailto:hello@apaxaa.com" class="btn-ghost">Talk to us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer style="border-top: 1px solid var(--border); padding: 48px 0 36px;">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 36px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <div style="width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, #8b5cf6, #d946ef); display: grid; place-items: center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          </div>
+          <span style="font-family: 'Hubot Sans'; font-weight: 700; font-size: 15px;">Phaxar</span>
+        </div>
+        <p style="font-size: 11px; color: #5a5a6a; line-height: 1.7; max-width: 240px;">A product of Apaxaa Technologies Ltd. Engineering the future of technology, from Enugu to everywhere.</p>
+      </div>
+      <div>
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4a4a5a; margin-bottom: 12px;">Product</div>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+          <li><a href="/new" style="color: var(--muted); text-decoration: none;">AI builder</a></li>
+          <li><a href="/docs" style="color: var(--muted); text-decoration: none;">Docs</a></li>
+          <li><a href="#pricing" style="color: var(--muted); text-decoration: none;">Pricing</a></li>
+          <li><a href="#" style="color: var(--muted); text-decoration: none;">Status</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4a4a5a; margin-bottom: 12px;">Company</div>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+          <li><a href="https://apaxaa.com" style="color: var(--muted); text-decoration: none;">Apaxaa</a></li>
+          <li><a href="https://apaxaa.com/companies" style="color: var(--muted); text-decoration: none;">Companies</a></li>
+          <li><a href="https://apaxaa.com/careers" style="color: var(--muted); text-decoration: none;">Careers</a></li>
+          <li><a href="mailto:hello@apaxaa.com" style="color: var(--muted); text-decoration: none;">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4a4a5a; margin-bottom: 12px;">Legal</div>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+          <li><a href="/privacy" style="color: var(--muted); text-decoration: none;">Privacy</a></li>
+          <li><a href="/terms" style="color: var(--muted); text-decoration: none;">Terms</a></li>
+          <li><a href="/dpa" style="color: var(--muted); text-decoration: none;">DPA</a></li>
+          <li><a href="/imprint" style="color: var(--muted); text-decoration: none;">Imprint</a></li>
+        </ul>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 10px;">
+      <p style="font-size: 11px; color: #3a3a4a;">© 2026 Apaxaa Technologies Ltd · RC 9886261. All rights reserved.</p>
+      <p style="font-size: 11px; color: #3a3a4a;">Phaxar — engineering the future of technology.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= SCRIPTS ================= -->
+<script>
+  // Mobile menu
+  document.getElementById('menuBtn').addEventListener('click', function() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  });
+
+  // Scroll reveal
+  var reveals = document.querySelectorAll('.reveal');
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
     });
-  </script>
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  reveals.forEach(function(el) { observer.observe(el); });
+
+  // FAQ
+  document.querySelectorAll('.faq-q').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var answer = btn.nextElementSibling;
+      var chevron = btn.querySelector('.faq-chevron');
+      var isOpen = answer.classList.contains('open');
+      document.querySelectorAll('.faq-a').forEach(function(a) { a.classList.remove('open'); });
+      document.querySelectorAll('.faq-chevron').forEach(function(c) { c.classList.remove('open'); });
+      if (!isOpen) {
+        answer.classList.add('open');
+        chevron.classList.add('open');
+      }
+    });
+  });
+</script>
 </body>
 </html>
