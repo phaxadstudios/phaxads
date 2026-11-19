@@ -274,11 +274,143 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;margin-top:40px}
   .foot-grid{grid-template-columns:1fr}
   .cta{padding:44px 24px}
 }
+
+/* ================= hover & motion layer ================= */
+/* Cursor spotlight on cards: JS sets --mx/--my (px) on hover. */
+.spot{--mx:50%;--my:50%;position:relative;isolation:isolate}
+.spot::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;opacity:0;transition:opacity .35s;
+  background:radial-gradient(420px circle at var(--mx) var(--my),rgba(139,92,246,.16),transparent 45%)}
+.spot:hover::after{opacity:1}
+.spot>*{position:relative;z-index:1}
+/* A border that lights up where the cursor is. */
+.spot-edge{position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:2;opacity:0;transition:opacity .35s;
+  background:radial-gradient(260px circle at var(--mx) var(--my),rgba(196,181,253,.85),rgba(103,232,249,.35) 35%,transparent 60%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.spot:hover .spot-edge{opacity:1}
+
+.path,.eco-card,.plan,.compare-col,.faq-item{transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s,background .35s,border-color .35s}
+.eco-card:hover{transform:translateY(-5px);box-shadow:0 24px 60px -30px rgba(139,92,246,.55)}
+.eco-card::before{transition:opacity .4s,transform .6s}
+.eco-card:hover::before{opacity:.85;transform:scale(1.25)}
+.plan:hover{transform:translateY(-6px);box-shadow:0 30px 80px -40px rgba(139,92,246,.6)}
+.plan.featured:hover{box-shadow:0 0 90px rgba(139,92,246,.28),0 30px 80px -40px rgba(139,92,246,.7)}
+.plan li{transition:color .2s,transform .2s}
+.plan li:hover{color:var(--ink);transform:translateX(3px)}
+.compare-col.good:hover{background:linear-gradient(160deg,rgba(139,92,246,.14),rgba(34,211,238,.05))}
+.compare-col li{transition:transform .2s,color .2s}
+.compare-col li:hover{transform:translateX(4px);color:var(--ink)}
+.stat{transition:background .3s}
+.stat:hover{background:rgba(139,92,246,.07)}
+.stat b{transition:transform .35s cubic-bezier(.22,1,.36,1)}
+.stat:hover b{transform:scale(1.08)}
+.pipe-node{transition:transform .25s,border-color .25s,box-shadow .25s,color .25s}
+.pipe-node:hover{transform:translateY(-3px);border-color:rgba(139,92,246,.45);color:var(--ink);box-shadow:0 12px 30px -14px rgba(139,92,246,.6)}
+.pipe-node.live{animation:livePulse 2.6s ease-in-out infinite}
+@keyframes livePulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,.0)}50%{box-shadow:0 0 0 6px rgba(52,211,153,.12)}}
+.path-ico,.step-n{transition:transform .4s cubic-bezier(.22,1,.36,1),background .4s,-webkit-text-stroke .3s}
+.path:hover .path-ico{transform:rotate(-6deg) scale(1.08)}
+.step:hover .step-n{background:linear-gradient(120deg,#c4b5fd,#67e8f9);-webkit-background-clip:text;background-clip:text;-webkit-text-stroke:0px transparent;transform:translateY(-3px)}
+.step h3{transition:color .25s}
+.step:hover h3{color:#c4b5fd}
+.faq-item:hover{background:rgba(255,255,255,.015)}
+
+/* Buttons: a light sweep, an arrow that nudges forward. */
+.btn{position:relative;overflow:hidden}
+.btn-primary::before{content:'';position:absolute;top:0;left:-120%;width:60%;height:100%;transform:skewX(-20deg);
+  background:linear-gradient(90deg,transparent,rgba(139,92,246,.35),transparent);transition:left .6s ease}
+.btn-primary:hover::before{left:130%}
+.btn svg:last-child{transition:transform .25s}
+.btn:hover svg:last-child{transform:translateX(3px)}
+.btn-ghost:hover{box-shadow:0 0 0 1px rgba(196,181,253,.25),0 10px 30px -12px rgba(139,92,246,.5)}
+.btn:active{transform:translateY(0) scale(.98)}
+
+/* Nav: sliding gradient underline; brighter logo. */
+.nav-links a{position:relative;padding:4px 0}
+.nav-links a::after{content:'';position:absolute;left:0;right:0;bottom:-3px;height:1.5px;border-radius:2px;transform:scaleX(0);transform-origin:left;
+  background:linear-gradient(90deg,#c4b5fd,#67e8f9);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.nav-links a:hover::after{transform:scaleX(1)}
+.brand-mark{transition:transform .4s cubic-bezier(.22,1,.36,1),box-shadow .4s}
+.brand:hover .brand-mark{transform:rotate(-8deg) scale(1.06);box-shadow:0 0 36px rgba(139,92,246,.75)}
+.foot-col a{display:inline-flex;align-items:center;gap:0;transition:color .2s,gap .2s}
+.foot-col a::after{content:'→';opacity:0;transform:translateX(-4px);transition:opacity .2s,transform .2s;font-size:11px}
+.foot-col a:hover{gap:6px}
+.foot-col a:hover::after{opacity:1;transform:translateX(0)}
+
+/* Terminal: tilts toward the cursor (JS sets --rx/--ry). */
+.terminal-wrap{perspective:1400px}
+.terminal-wrap .terminal{transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .5s cubic-bezier(.22,1,.36,1),box-shadow .5s}
+.terminal-wrap:hover .terminal{box-shadow:0 50px 140px rgba(0,0,0,.7),0 0 80px -20px rgba(139,92,246,.45),0 0 0 1px rgba(255,255,255,.05) inset}
+.terminal-wrap:hover::before{opacity:1;animation-duration:5s}
+.term-line{opacity:0;transform:translateY(4px);transition:opacity .35s,transform .35s}
+.term-line.on{opacity:1;transform:none}
+
+/* Use-case marquee */
+.marquee{position:relative;overflow:hidden;padding:22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  -webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.marquee-track{display:flex;gap:14px;width:max-content;animation:marquee 38s linear infinite}
+.marquee:hover .marquee-track{animation-play-state:paused}
+@keyframes marquee{to{transform:translateX(-50%)}}
+.chip{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.025);
+  color:#b8b8c8;font-size:13.5px;white-space:nowrap;transition:all .25s}
+.chip:hover{border-color:rgba(139,92,246,.5);color:var(--ink);background:rgba(139,92,246,.1);transform:translateY(-2px)}
+.chip i{font-style:normal;font-size:16px}
+.marquee-label{text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin:64px 0 16px}
+
+/* Soft glow that follows the cursor across the hero. */
+.hero-glow{position:absolute;width:520px;height:520px;border-radius:50%;pointer-events:none;z-index:-1;left:0;top:0;opacity:0;
+  background:radial-gradient(circle,rgba(139,92,246,.18),transparent 65%);transform:translate(-50%,-50%);transition:opacity .5s}
+.hero:hover .hero-glow{opacity:1}
+
+
+/* ===== pxxl-standard layer ===== */
+/* Page rails: two hairlines framing the content, with + marks where sections meet. */
+.rails{position:fixed;inset:0;pointer-events:none;z-index:0}
+.rails::before,.rails::after{content:'';position:absolute;top:0;bottom:0;width:1px;
+  background:linear-gradient(180deg,transparent,rgba(255,255,255,.06) 12%,rgba(255,255,255,.06) 88%,transparent)}
+.rails::before{left:max(16px,calc(50% - 620px))}
+.rails::after{right:max(16px,calc(50% - 620px))}
+.sec::before{content:'';position:absolute;top:0;left:max(16px,calc(50% - 620px));right:max(16px,calc(50% - 620px));height:1px;
+  background:linear-gradient(90deg,rgba(255,255,255,.07),rgba(255,255,255,.02) 50%,rgba(255,255,255,.07))}
+.sec>.plus,.sec::after{pointer-events:none}
+.sec::after{content:'+';position:absolute;top:-11px;left:calc(max(16px,calc(50% - 620px)) - 6px);font:300 18px/1 var(--mono);color:rgba(255,255,255,.28)}
+
+/* Rotating word in the headline. */
+.rot{display:inline-grid;vertical-align:bottom;transition:width .55s cubic-bezier(.22,1,.36,1)}
+.rot>span{grid-area:1/1;justify-self:start;white-space:nowrap;opacity:0;transform:translateY(.45em);filter:blur(10px);
+  transition:opacity .5s,transform .6s cubic-bezier(.22,1,.36,1),filter .5s;
+  background:linear-gradient(100deg,#c4b5fd,#e879f9 55%,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:.08em}
+.rot>span.on{opacity:1;transform:none;filter:none}
+.rot>span.out{opacity:0;transform:translateY(-.45em);filter:blur(10px)}
+.hero h1 .plain{color:var(--ink)}
+
+/* Glossy, pressable primary button. */
+.btn-primary{background:linear-gradient(180deg,#ffffff,#e6e4f0);
+  box-shadow:0 1px 0 #fff inset,0 -2px 0 rgba(0,0,0,.12) inset,0 2px 0 #9d8fd0,0 10px 30px -6px rgba(139,92,246,.45)}
+.btn-primary:hover{background:linear-gradient(180deg,#fff,#efedf8);transform:translateY(-1px);
+  box-shadow:0 1px 0 #fff inset,0 -2px 0 rgba(0,0,0,.12) inset,0 3px 0 #9d8fd0,0 16px 40px -6px rgba(139,92,246,.6)}
+.btn-primary:active{transform:translateY(2px);box-shadow:0 1px 0 #fff inset,0 0 0 #9d8fd0,0 4px 14px -6px rgba(139,92,246,.5)}
+
+/* Business strip: bordered cells, like a logo wall. */
+.marquee{padding:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(255,255,255,.012)}
+.marquee-track{gap:0}
+.chip{border-radius:0;border:none;border-right:1px solid var(--line);background:transparent;padding:26px 38px;font-size:15px;font-weight:550;color:#9a9aab;letter-spacing:-.01em}
+.chip:hover{transform:none;background:rgba(139,92,246,.08);color:var(--ink)}
+.chip i{filter:grayscale(1) brightness(1.3);transition:filter .3s}
+.chip:hover i{filter:none}
+@media (max-width:640px){.chip{padding:20px 26px;font-size:14px}}
+
+@media (prefers-reduced-motion:reduce){
+  .rot>span{transition:none}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .term-line{opacity:1;transform:none}
+  .reveal{opacity:1;transform:none}
+}
 </style>
 </head>
 <body>
 
 <div class="grain"></div>
+<div class="rails" aria-hidden="true"></div>
 
 <!-- NAV -->
 <div class="nav-outer" id="navOuter">
@@ -315,10 +447,11 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;margin-top:40px}
 <!-- HERO -->
 <section class="hero">
   <canvas id="particles"></canvas>
+  <div class="hero-glow" id="heroGlow"></div>
   <div class="mesh"></div>
   <div class="wrap" style="text-align:center;position:relative">
     <div class="hero-badge"><span class="dot"></span> A product of Apaxaa · Built in Enugu · RC 9886261</div>
-    <h1>Describe a website.<br><em>Watch it go live.</em></h1>
+    <h1><span class="plain">Describe your</span> <span class="rot" id="rot" aria-label="business"><span class="on">bakery</span><span>salon</span><span>boutique</span><span>church</span><span>school</span><span>law firm</span><span>restaurant</span><span>clinic</span></span><span class="plain">.</span><br><span class="plain">Watch it go live.</span></h1>
     <p class="lede">Phaxar turns a sentence into a deployed website. AI agents write it, edge infrastructure hosts it, and <strong>Rael</strong> keeps it safe. Or bring your own code — GitHub, zip, whatever. <strong>Built for Nigerian businesses.</strong></p>
     <div class="hero-actions">
       <a href="/new" class="btn btn-primary btn-lg">
@@ -337,17 +470,17 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;margin-top:40px}
       <div class="terminal">
         <div class="term-bar"><i></i><i></i><i></i><span class="term-title">phaxar.xyz / new</span></div>
         <div class="term-body">
-          <div class="c">// your prompt</div>
-          <div><span class="s">"A landing page for my coffee shop in Enugu. Warm colors, menu, hours, WhatsApp order button, Paystack checkout."</span></div>
-          <div style="margin-top:16px"><span class="k">→</span> agent generating <span class="m">(claude-sonnet-5-5)</span></div>
-          <div><span class="k">→</span> structured output validated <span class="ok">✓</span></div>
-          <div><span class="k">→</span> sandbox render check <span class="ok">✓ secure</span></div>
-          <div><span class="k">→</span> building static bundle <span class="ok">done in 4.2s</span></div>
-          <div><span class="k">→</span> edge deploy · SSL · Rael scan</div>
-          <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)">
+          <div class="term-line c">// your prompt</div>
+          <div class="term-line"><span class="s" id="typePrompt">"A landing page for my coffee shop in Enugu. Warm colors, menu, hours, WhatsApp order button, Paystack checkout."</span></div>
+          <div class="term-line" style="margin-top:16px"><span class="k">→</span> agent generating <span class="m">(claude-sonnet-5-5)</span></div>
+          <div class="term-line"><span class="k">→</span> structured output validated <span class="ok">✓</span></div>
+          <div class="term-line"><span class="k">→</span> sandbox render check <span class="ok">✓ secure</span></div>
+          <div class="term-line"><span class="k">→</span> building static bundle <span class="ok">done in 4.2s</span></div>
+          <div class="term-line"><span class="k">→</span> edge deploy · SSL · Rael scan</div>
+          <div class="term-line" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)">
             <span class="ok">✓ Live at https://enugu-coffee.phaxar.xyz</span> <span class="cursor"></span>
           </div>
-          <div class="m">0 vulnerabilities · 0 forms collecting passwords · WhatsApp + Paystack wired</div>
+          <div class="term-line m">0 vulnerabilities · 0 forms collecting passwords · WhatsApp + Paystack wired</div>
         </div>
       </div>
     </div>
@@ -364,7 +497,17 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;margin-top:40px}
   </div>
 </section>
 
-<div class="wrap"><div class="divider"></div></div>
+<p class="marquee-label">Built for businesses like yours</p>
+<div class="marquee" aria-label="Kinds of business Phaxar builds for">
+  <div class="marquee-track">
+    <span class="chip"><i>👗</i>Fashion &amp; fabrics</span><span class="chip"><i>🍲</i>Food &amp; catering</span><span class="chip"><i>💇🏾‍♀️</i>Salons &amp; barbers</span>
+    <span class="chip"><i>⛪</i>Churches</span><span class="chip"><i>🏫</i>Schools</span><span class="chip"><i>🏠</i>Real estate</span><span class="chip"><i>🎉</i>Events</span>
+    <span class="chip"><i>💊</i>Pharmacies</span><span class="chip"><i>📸</i>Photographers</span><span class="chip"><i>🛠️</i>Repairs &amp; services</span><span class="chip"><i>⚖️</i>Lawyers &amp; consultants</span>
+    <span class="chip" aria-hidden="true"><i>👗</i>Fashion &amp; fabrics</span><span class="chip" aria-hidden="true"><i>🍲</i>Food &amp; catering</span><span class="chip" aria-hidden="true"><i>💇🏾‍♀️</i>Salons &amp; barbers</span>
+    <span class="chip" aria-hidden="true"><i>⛪</i>Churches</span><span class="chip" aria-hidden="true"><i>🏫</i>Schools</span><span class="chip" aria-hidden="true"><i>🏠</i>Real estate</span><span class="chip" aria-hidden="true"><i>🎉</i>Events</span>
+    <span class="chip" aria-hidden="true"><i>💊</i>Pharmacies</span><span class="chip" aria-hidden="true"><i>📸</i>Photographers</span><span class="chip" aria-hidden="true"><i>🛠️</i>Repairs &amp; services</span><span class="chip" aria-hidden="true"><i>⚖️</i>Lawyers &amp; consultants</span>
+  </div>
+</div>
 
 <!-- PIPELINE -->
 <section class="sec">
@@ -781,6 +924,92 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   }).observe(canvas);
   let t;
   window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(size, 150); }, { passive: true });
+})();
+
+// ================= hover & motion layer =================
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  // Cursor spotlight + lit border on cards.
+  document.querySelectorAll('.path,.eco-card,.plan,.compare-col,.stat,.faq-item,.pipe-node,.cta,.dev').forEach((el) => {
+    el.classList.add('spot');
+    const edge = document.createElement('span');
+    edge.className = 'spot-edge';
+    el.appendChild(edge);
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    });
+  });
+
+  // Hero glow follows the cursor.
+  const hero = document.querySelector('.hero');
+  const glow = document.getElementById('heroGlow');
+  if (hero && glow && fine && !reduce) {
+    hero.addEventListener('pointermove', (e) => {
+      const r = hero.getBoundingClientRect();
+      glow.style.left = `${e.clientX - r.left}px`;
+      glow.style.top = `${e.clientY - r.top}px`;
+    });
+  }
+
+  // Terminal tilts toward the cursor (desktop only).
+  const tw = document.querySelector('.terminal-wrap');
+  if (tw && fine && !reduce) {
+    tw.addEventListener('pointermove', (e) => {
+      const r = tw.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      tw.style.setProperty('--ry', `${(x * 6).toFixed(2)}deg`);
+      tw.style.setProperty('--rx', `${(-y * 5).toFixed(2)}deg`);
+    });
+    tw.addEventListener('pointerleave', () => { tw.style.setProperty('--ry', '0deg'); tw.style.setProperty('--rx', '0deg'); });
+  }
+
+  // Terminal "types" the prompt, then reveals each step in turn.
+  const term = document.querySelector('.terminal-wrap .term-body');
+  if (term) {
+    const lines = [...term.querySelectorAll('.term-line')];
+    const prompt = document.getElementById('typePrompt');
+    const full = prompt ? prompt.textContent : '';
+    if (reduce) { lines.forEach((l) => l.classList.add('on')); return; }
+    let started = false;
+    const run = async () => {
+      if (started) return; started = true;
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      lines[0] && lines[0].classList.add('on');
+      if (prompt) {
+        prompt.textContent = '';
+        lines[1] && lines[1].classList.add('on');
+        for (let i = 0; i <= full.length; i += 2) { prompt.textContent = full.slice(0, i); await wait(18); }
+        prompt.textContent = full;
+      }
+      for (const l of lines.slice(2)) { await wait(420); l.classList.add('on'); }
+    };
+    new IntersectionObserver(([e], o) => { if (e.isIntersecting) { run(); o.disconnect(); } }, { threshold: 0.35 }).observe(term);
+  }
+})();
+
+// Headline: cycle the business word, animating the width so the line doesn't jump.
+(() => {
+  const rot = document.getElementById('rot');
+  if (!rot) return;
+  const items = [...rot.children];
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let i = 0;
+  const fit = () => { rot.style.width = items[i].getBoundingClientRect().width + 'px'; };
+  fit();
+  window.addEventListener('resize', fit, { passive: true });
+  setInterval(() => {
+    const prev = items[i];
+    i = (i + 1) % items.length;
+    prev.classList.remove('on'); prev.classList.add('out');
+    setTimeout(() => prev.classList.remove('out'), 600);
+    items[i].classList.add('on');
+    fit();
+  }, 2200);
 })();
 </script>
 </body>
