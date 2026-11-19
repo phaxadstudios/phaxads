@@ -96,11 +96,16 @@ body{
 
 /* ---------- terminal ---------- */
 .terminal-wrap{position:relative;max-width:940px;margin:72px auto 0}
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
 .terminal-wrap::before{
-  content:'';position:absolute;inset:-2px;border-radius:22px;z-index:-1;
-  background:conic-gradient(from 0deg,transparent,rgba(139,92,246,.6),rgba(232,121,249,.5),transparent 65%);
-  animation:spin 8s linear infinite;filter:blur(14px);opacity:.7;
+  content:'';position:absolute;inset:-1px;border-radius:21px;z-index:2;pointer-events:none;padding:1px;
+  background:conic-gradient(from var(--ang),transparent 0 70%,rgba(196,181,253,.9) 80%,rgba(232,121,249,.9) 85%,rgba(103,232,249,.8) 90%,transparent 95%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  animation:ang 6s linear infinite;
 }
+.terminal-wrap::after{content:'';position:absolute;inset:10% 6% -6%;z-index:-1;pointer-events:none;
+  background:radial-gradient(60% 60% at 50% 40%,rgba(139,92,246,.3),transparent 70%);filter:blur(40px)}
+@keyframes ang{to{--ang:360deg}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .terminal{background:#0a0a11;border:1px solid var(--line-2);border-radius:20px;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04) inset}
 .term-bar{display:flex;align-items:center;gap:7px;padding:14px 18px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.018)}
@@ -340,7 +345,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;margin-top:40px}
 .terminal-wrap{perspective:1400px}
 .terminal-wrap .terminal{transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .5s cubic-bezier(.22,1,.36,1),box-shadow .5s}
 .terminal-wrap:hover .terminal{box-shadow:0 50px 140px rgba(0,0,0,.7),0 0 80px -20px rgba(139,92,246,.45),0 0 0 1px rgba(255,255,255,.05) inset}
-.terminal-wrap:hover::before{opacity:1;animation-duration:5s}
+.terminal-wrap:hover::before{animation-duration:3s}
 .term-line{opacity:0;transform:translateY(4px);transition:opacity .35s,transform .35s}
 .term-line.on{opacity:1;transform:none}
 
