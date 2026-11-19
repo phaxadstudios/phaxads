@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phaxar — Describe a website. Watch it go live.</title>
+  <meta name="description" content="Phaxar turns a sentence into a deployed website. AI agents build it, infrastructure hosts it, Rael keeps it safe. A product of Apaxaa." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          animation: {
+            'float': 'float 8s ease-in-out infinite',
+            'pulse-slow': 'pulse 4s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-20px)' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background: #08080c; color: #fff; overflow-x: hidden; }
+    .bg-grid {
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+    }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .gradient-text {
+      background: linear-gradient(90deg, #c4b5fd, #f0abfc, #67e8f9);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .glass {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px);
+    }
+    .glow {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(140px);
+      pointer-events: none;
+      z-index: -1;
+    }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+    .faq-answer.open { max-height: 300px; }
+    .faq-chevron { transition: transform .3s ease; }
+    .faq-chevron.open { transform: rotate(180deg); }
+    ::selection { background: rgba(167,139,250,0.35); }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #08080c; }
+    ::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 5px; }
+  </style>
+</head>
+<body class="font-sans antialiased">
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="fixed top-0 inset-x-0 z-50">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6">
+      <nav class="mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-black/50 px-4 py-3 backdrop-blur-xl">
+        <a href="#" class="flex items-center gap-2">
+          <div class="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500">
+            <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          </div>
+          <span class="text-lg font-semibold tracking-tight">Phaxar</span>
+          <span class="ml-1 rounded-md border border-white/10 px-1.5 py-0.5 text-[10px] font-medium text-white/60">by Apaxaa</span>
+        </a>
+
+        <div class="hidden items-center gap-8 md:flex">
+          <a href="#product" class="text-sm text-white/60 transition hover:text-white">Product</a>
+          <a href="#how" class="text-sm text-white/60 transition hover:text-white">How it works</a>
+          <a href="#pricing" class="text-sm text-white/60 transition hover:text-white">Pricing</a>
+          <a href="#developers" class="text-sm text-white/60 transition hover:text-white">Developers</a>
+        </div>
+
+        <div class="hidden items-center gap-3 md:flex">
+          <a href="/login" class="text-sm text-white/70 transition hover:text-white">Sign in</a>
+          <a href="/new" class="group inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-white/90">
+            Start free
+            <svg class="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+
+        <button id="menuBtn" class="grid h-9 w-9 place-items-center rounded-lg border border-white/10 md:hidden" aria-label="Menu">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </nav>
+
+      <div id="mobileMenu" class="mt-2 hidden rounded-2xl border border-white/10 bg-black/90 p-4 backdrop-blur-xl md:hidden">
+        <div class="flex flex-col gap-3">
+          <a href="#product" class="text-sm text-white/70">Product</a>
+          <a href="#how" class="text-sm text-white/70">How it works</a>
+          <a href="#pricing" class="text-sm text-white/70">Pricing</a>
+          <a href="#developers" class="text-sm text-white/70">Developers</a>
+          <a href="/new" class="mt-2 rounded-xl bg-white px-4 py-2 text-center text-sm font-medium text-black">Start free</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO ================= -->
+  <section class="relative overflow-hidden pt-36 pb-24 sm:pt-44">
+    <div class="bg-grid absolute inset-0 -z-10"></div>
+    <div class="glow left-1/2 top-0 h-[520px] w-[820px] -translate-x-1/2 bg-violet-600/25"></div>
+    <div class="glow right-1/4 top-40 h-[320px] w-[320px] bg-fuchsia-600/20 animate-pulse-slow"></div>
+    <div class="glow left-1/4 top-60 h-[280px] w-[280px] bg-cyan-500/15"></div>
+
+    <div class="mx-auto max-w-4xl px-4 text-center sm:px-6">
+      <div class="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 backdrop-blur">
+        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+        A product of Apaxaa · Built in Enugu
+      </div>
+
+      <h1 class="text-balance text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
+        Describe a website.
+        <br />
+        <span class="gradient-text">Watch it go live.</span>
+      </h1>
+
+      <p class="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-white/60 sm:text-lg">
+        Phaxar turns a sentence into a deployed website. AI agents build it,
+        infrastructure hosts it, and Rael keeps it safe. Or bring your own code —
+        GitHub, zip, whatever. One platform, three ways to ship.
+      </p>
+
+      <div class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <a href="/new" class="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/90 sm:w-auto">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          Build my site free
+          <svg class="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+        <a href="#how" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white/10 sm:w-auto">
+          See how it works
+        </a>
+      </div>
+
+      <p class="mt-5 text-xs text-white/40">No credit card. 3 free generations. Your first site is live in under a minute.</p>
+    </div>
+
+    <!-- hero mock -->
+    <div class="mx-auto mt-16 max-w-5xl px-4 sm:px-6">
+      <div class="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-2xl shadow-violet-900/20 backdrop-blur animate-float" style="animation-duration: 9s;">
+        <div class="flex items-center gap-2 border-b border-white/10 px-4 py-3">
+          <span class="h-3 w-3 rounded-full bg-red-400/80"></span>
+          <span class="h-3 w-3 rounded-full bg-yellow-400/80"></span>
+          <span class="h-3 w-3 rounded-full bg-green-400/80"></span>
+          <div class="ml-3 flex-1 rounded-md bg-white/5 px-3 py-1 text-[11px] text-white/40">phaxar.xyz / new</div>
+        </div>
+        <div class="grid gap-4 p-5 sm:grid-cols-5 sm:p-6">
+          <div class="sm:col-span-2">
+            <div class="mb-2 text-[11px] uppercase tracking-wider text-white/40">Prompt</div>
+            <div class="rounded-xl border border-white/10 bg-black/40 p-3 text-sm text-white/70">
+              A landing page for my coffee shop in Enugu. Warm colors, menu section, opening hours, and a WhatsApp order button.
+            </div>
+            <div class="mt-3 flex items-center gap-2 text-[11px] text-emerald-300">
+              <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400"></span>
+              Agent generating · validating · deploying…
+            </div>
+          </div>
+          <div class="sm:col-span-3">
+            <div class="mb-2 text-[11px] uppercase tracking-wider text-white/40">Live preview</div>
+            <div class="overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-amber-100 to-orange-200 p-4 text-amber-950">
+              <div class="text-[10px] font-semibold uppercase tracking-widest opacity-60">Enugu Coffee Co.</div>
+              <div class="mt-1 text-xl font-bold leading-tight">Fresh roast. Slow mornings.</div>
+              <div class="mt-3 grid grid-cols-3 gap-2">
+                <div class="rounded-lg bg-white/60 p-2 text-[10px] font-medium">Espresso</div>
+                <div class="rounded-lg bg-white/60 p-2 text-[10px] font-medium">Cold brew</div>
+                <div class="rounded-lg bg-white/60 p-2 text-[10px] font-medium">Pastries</div>
+              </div>
+              <div class="mt-3 inline-flex rounded-md bg-amber-950 px-2 py-1 text-[10px] font-semibold text-white">Order on WhatsApp</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= THREE PATHS ================= -->
+  <section id="product" class="relative py-24 sm:py-32">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6">
+      <div class="reveal mx-auto max-w-2xl text-center">
+        <div class="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/80">Three ways to ship</div>
+        <h2 class="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">One platform. Every kind of builder.</h2>
+        <p class="mt-4 text-pretty text-white/60">Whether you write code every day or have never opened a terminal, Phaxar meets you where you are.</p>
+      </div>
+
+      <div class="mt-14 grid gap-5 md:grid-cols-3">
+        <!-- card 1 -->
+        <div class="reveal group relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-white/20 hover:bg-white/[0.05]">
+          <div class="mb-5 inline-flex items-center gap-2">
+            <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 text-violet-200 ring-1 ring-white/10">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M12 8V4M8 4h8"/><circle cx="8.5" cy="14" r="1" fill="currentColor"/><circle cx="15.5" cy="14" r="1" fill="currentColor"/></svg>
+            </div>
+            <span class="rounded-md border border-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white/50">AI Agent</span>
+          </div>
+          <h3 class="text-lg font-semibold">Describe it. Ship it.</h3>
+          <p class="mt-2 text-sm leading-relaxed text-white/60">Tell Phaxar what you want in plain English. Our AI agent writes the code, validates it in a sandbox, and deploys it live — in under 60 seconds.</p>
+          <div class="mt-5 inline-flex items-center gap-1 text-sm text-violet-300 opacity-0 transition group-hover:opacity-100">Learn more →</div>
+        </div>
+
+        <!-- card 2 -->
+        <div class="reveal group relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-white/20 hover:bg-white/[0.05]">
+          <div class="mb-5 inline-flex items-center gap-2">
+            <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 text-violet-200 ring-1 ring-white/10">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+            </div>
+            <span class="rounded-md border border-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white/50">GitHub</span>
+          </div>
+          <h3 class="text-lg font-semibold">Bring your repo.</h3>
+          <p class="mt-2 text-sm leading-relaxed text-white/60">Already have a codebase? Connect GitHub with a read-only token. We build and deploy on every push. No Vercel account needed.</p>
+          <div class="mt-5 inline-flex items-center gap-1 text-sm text-violet-300 opacity-0 transition group-hover:opacity-100">Learn more →</div>
+        </div>
+
+        <!-- card 3 -->
+        <div class="reveal group relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-white/20 hover:bg-white/[0.05]">
+          <div class="mb-5 inline-flex items-center gap-2">
+            <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 text-violet-200 ring-1 ring-white/10">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.9A5 5 0 1115.9 6h.1a5 5 0 011.9 9.6M12 12v9m0-9l-3 3m3-3l3 3"/></svg>
+            </div>
+            <span class="rounded-md border border-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white/50">Manual</span>
+          </div>
+          <h3 class="text-lg font-semibold">Drop your files.</h3>
+          <p class="mt-2 text-sm leading-relaxed text-white/60">No Git? No problem. Drag a folder or a zip. We handle the build, SSL, CDN, and give you a live link instantly.</p>
+          <div class="mt-5 inline-flex items-center gap-1 text-sm text-violet-300 opacity-0 transition group-hover:opacity-100">Learn more →</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FEATURES ================= -->
+  <section id="how" class="relative py-24 sm:py-32">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6">
+      <div class="grid gap-14 lg:grid-cols-2 lg:items-center">
+        <div class="reveal">
+          <div class="text-xs font-medium uppercase tracking-[0.2em] text-cyan-300/80">Why Phaxar</div>
+          <h2 class="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Infrastructure-grade hosting,<br />without the infrastructure.</h2>
+          <p class="mt-4 max-w-lg text-pretty text-white/60">Every site on Phaxar runs on the same edge network that powers some of the world's largest platforms. You get the performance without the ops.</p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="reveal h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <div class="mb-3 grid h-9 w-9 place-items-center rounded-lg bg-white/5 text-white/80 ring-1 ring-white/10">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <h3 class="text-sm font-semibold">Live in 60 seconds</h3>
+            <p class="mt-1.5 text-xs leading-relaxed text-white/55">From prompt to production URL. No DNS wait, no config files, no cold starts.</p>
+          </div>
+
+          <div class="reveal h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <div class="mb-3 grid h-9 w-9 place-items-center rounded-lg bg-white/5 text-white/80 ring-1 ring-white/10">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>
+            </div>
+            <h3 class="text-sm font-semibold">Free subdomain, forever</h3>
+            <p class="mt-1.5 text-xs leading-relaxed text-white/55">Every project gets yourname.phaxar.xyz with automatic SSL. Upgrade only when you want your own domain.</p>
+          </div>
+
+          <div class="reveal h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <div class="mb-3 grid h-9 w-9 place-items-center rounded-lg bg-white/5 text-white/80 ring-1 ring-white/10">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h3 class="text-sm font-semibold">Secured by Rael</h3>
+            <p class="mt-1.5 text-xs leading-relaxed text-white/55">Every site is scanned by Apaxaa's fraud and protection engine before it goes live.</p>
+          </div>
+
+          <div class="reveal h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <div class="mb-3 grid h-9 w-9 place-items-center rounded-lg bg-white/5 text-white/80 ring-1 ring-white/10">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+            </div>
+            <h3 class="text-sm font-semibold">Developer escape hatch</h3>
+            <p class="mt-1.5 text-xs leading-relaxed text-white/55">Full Git workflow, environment variables, and preview deployments when you need control.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PRICING ================= -->
+  <section id="pricing" class="relative py-24 sm:py-32">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6">
+      <div class="reveal mx-auto max-w-2xl text-center">
+        <div class="text-xs font-medium uppercase tracking-[0.2em] text-fuchsia-300/80">Pricing</div>
+        <h2 class="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Start free. Upgrade when it ships.</h2>
+        <p class="mt-4 text-pretty text-white/60">Naira pricing, no FX surprises. Cancel anytime.</p>
+      </div>
+
+      <div class="mt-14 grid gap-5 lg:grid-cols-3">
+        <!-- starter -->
+        <div class="reveal relative flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+          <div class="text-sm font-medium text-white/70">Starter</div>
+          <div class="mt-2 flex items-end gap-1">
+            <span class="text-4xl font-semibold tracking-tight">₦0</span>
+            <span class="mb-1 text-xs text-white/50">forever</span>
+          </div>
+          <p class="mt-2 text-xs text-white/50">For trying the magic.</p>
+          <ul class="mt-6 flex-1 space-y-2.5 text-sm text-white/70">
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>3 AI generations / month</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>1 project</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Free phaxar.xyz subdomain</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Automatic SSL</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Rael security scan</span></li>
+          </ul>
+          <a href="/new" class="mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium transition hover:bg-white/10">Start free →</a>
+        </div>
+
+        <!-- builder -->
+        <div class="reveal relative flex h-full flex-col rounded-2xl border border-violet-400/40 bg-gradient-to-b from-violet-500/[0.08] to-transparent p-6 shadow-lg shadow-violet-900/20">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">Most popular</div>
+          <div class="text-sm font-medium text-white/70">Builder</div>
+          <div class="mt-2 flex items-end gap-1">
+            <span class="text-4xl font-semibold tracking-tight">₦4,500</span>
+            <span class="mb-1 text-xs text-white/50">/ month</span>
+          </div>
+          <p class="mt-2 text-xs text-white/50">For people shipping real sites.</p>
+          <ul class="mt-6 flex-1 space-y-2.5 text-sm text-white/70">
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>50 AI generations / month</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>10 projects</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Custom domain support</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>GitHub + manual deploy</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Priority build queue</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Email support</span></li>
+          </ul>
+          <a href="/checkout?plan=builder" class="mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-white/90">Upgrade to Builder →</a>
+        </div>
+
+        <!-- studio -->
+        <div class="reveal relative flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+          <div class="text-sm font-medium text-white/70">Studio</div>
+          <div class="mt-2 flex items-end gap-1">
+            <span class="text-4xl font-semibold tracking-tight">₦15,000</span>
+            <span class="mb-1 text-xs text-white/50">/ month</span>
+          </div>
+          <p class="mt-2 text-xs text-white/50">For agencies and teams.</p>
+          <ul class="mt-6 flex-1 space-y-2.5 text-sm text-white/70">
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Unlimited AI generations</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Unlimited projects</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Custom domains + DNS</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Team seats (up to 5)</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Rael deep scan + reports</span></li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Dedicated support</span></li>
+          </ul>
+          <a href="mailto:hello@apaxaa.com" class="mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium transition hover:bg-white/10">Talk to us →</a>
+        </div>
+      </div>
+
+      <p class="reveal mt-8 text-center text-xs text-white/40">All plans include automatic SSL, free phaxar.xyz subdomain, and Rael security scanning. VAT added where applicable.</p>
+    </div>
+  </section>
+
+  <!-- ================= DEVELOPERS ================= -->
+  <section id="developers" class="relative py-24 sm:py-32">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6">
+      <div class="reveal relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.01] p-8 sm:p-12">
+        <div class="glow -right-20 -top-20 h-64 w-64 bg-violet-500/25"></div>
+        <div class="grid gap-8 lg:grid-cols-2 lg:items-center">
+          <div>
+            <div class="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/80">For developers</div>
+            <h2 class="mt-3 text-balance text-3xl font-semibold tracking-tight">Your workflow, unchanged.</h2>
+            <p class="mt-3 max-w-md text-pretty text-white/60">Connect GitHub, push to main, get a preview URL. Environment variables, build logs, rollbacks — the things you already expect, on infrastructure built for Africa.</p>
+            <div class="mt-6 flex flex-wrap gap-3">
+              <a href="/docs" class="inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-black hover:bg-white/90">Read the docs →</a>
+              <a href="https://github.com" class="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium hover:bg-white/10">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+                View on GitHub
+              </a>
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-white/10 bg-black/50 p-4 font-mono text-[12px] leading-relaxed text-white/70">
+            <div class="mb-2 flex gap-1.5">
+              <span class="h-2.5 w-2.5 rounded-full bg-red-400/70"></span>
+              <span class="h-2.5 w-2.5 rounded-full bg-yellow-400/70"></span>
+              <span class="h-2.5 w-2.5 rounded-full bg-green-400/70"></span>
+            </div>
+            <div><span class="text-violet-300">$</span> npx phaxar deploy</div>
+            <div class="text-white/40">→ Detected Next.js 14</div>
+            <div class="text-white/40">→ Installing dependencies…</div>
+            <div class="text-white/40">→ Building… done in 12.4s</div>
+            <div class="text-emerald-300">✓ Deployed to https://myapp.phaxar.xyz</div>
+            <div class="text-white/40">→ SSL issued · Rael scan passed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FAQ ================= -->
+  <section class="relative py-24 sm:py-32">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6">
+      <div class="reveal text-center">
+        <h2 class="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Questions, answered.</h2>
+      </div>
+
+      <div class="reveal mt-10 divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[0.02]">
+        <div>
+          <button class="faq-btn flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+            <span class="text-sm font-medium">Do I need to know how to code?</span>
+            <svg class="faq-chevron h-4 w-4 shrink-0 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="faq-answer px-5 text-sm leading-relaxed text-white/60"><p class="pb-4">No. Describe your site in plain English and Phaxar builds it. If you do code, you can connect GitHub or upload files directly.</p></div>
+        </div>
+
+        <div>
+          <button class="faq-btn flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+            <span class="text-sm font-medium">Where are the sites hosted?</span>
+            <svg class="faq-chevron h-4 w-4 shrink-0 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="faq-answer px-5 text-sm leading-relaxed text-white/60"><p class="pb-4">On Phaxar's edge network, built on Vercel infrastructure, with data residency options in Nigeria through our infrastructure partners.</p></div>
+        </div>
+
+        <div>
+          <button class="faq-btn flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+            <span class="text-sm font-medium">Can I use my own domain?</span>
+            <svg class="faq-chevron h-4 w-4 shrink-0 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="faq-answer px-5 text-sm leading-relaxed text-white/60"><p class="pb-4">Yes. On the Builder plan and above, you can attach any domain you own. We handle DNS verification and SSL automatically.</p></div>
+        </div>
+
+        <div>
+          <button class="faq-btn flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+            <span class="text-sm font-medium">What happens if I hit my generation limit?</span>
+            <svg class="faq-chevron h-4 w-4 shrink-0 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="faq-answer px-5 text-sm leading-relaxed text-white/60"><p class="pb-4">You can upgrade at any time. Unused generations do not roll over, but your existing sites stay live.</p></div>
+        </div>
+
+        <div>
+          <button class="faq-btn flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+            <span class="text-sm font-medium">Is Phaxar a product of Apaxaa?</span>
+            <svg class="faq-chevron h-4 w-4 shrink-0 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="faq-answer px-5 text-sm leading-relaxed text-white/60"><p class="pb-4">Yes. Phaxar is built and operated by Apaxaa Technologies Ltd (RC 9886261), the same team behind Joyet, Candleben, and Rael.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FINAL CTA ================= -->
+  <section class="relative py-24 sm:py-32">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6">
+      <div class="reveal relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-violet-600/20 via-fuchsia-600/10 to-cyan-500/10 p-10 text-center sm:p-16">
+        <div class="glow left-1/2 top-0 h-64 w-64 -translate-x-1/2 bg-violet-500/30"></div>
+        <h2 class="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Your next website starts with a sentence.</h2>
+        <p class="mx-auto mt-4 max-w-lg text-pretty text-white/60">Join the builders shipping on Phaxar. Free to start, live in seconds, owned by you.</p>
+        <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <a href="/new" class="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/90 sm:w-auto">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+            Build my site free
+            <svg class="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+          <a href="mailto:hello@apaxaa.com" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium backdrop-blur transition hover:bg-white/10 sm:w-auto">Talk to us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="border-t border-white/10 py-14">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6">
+      <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <div class="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500">
+              <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+            </div>
+            <span class="text-lg font-semibold">Phaxar</span>
+          </div>
+          <p class="mt-3 max-w-xs text-xs leading-relaxed text-white/50">A product of Apaxaa Technologies Ltd. Engineering the future of technology, from Enugu to everywhere.</p>
+        </div>
+
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-white/40">Product</div>
+          <ul class="mt-3 space-y-2 text-sm text-white/60">
+            <li><a href="/new" class="hover:text-white">AI builder</a></li>
+            <li><a href="/docs" class="hover:text-white">Docs</a></li>
+            <li><a href="#pricing" class="hover:text-white">Pricing</a></li>
+            <li><a href="#" class="hover:text-white">Status</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-white/40">Company</div>
+          <ul class="mt-3 space-y-2 text-sm text-white/60">
+            <li><a href="https://apaxaa.com" class="hover:text-white">Apaxaa</a></li>
+            <li><a href="https://apaxaa.com/companies" class="hover:text-white">Companies</a></li>
+            <li><a href="https://apaxaa.com/careers" class="hover:text-white">Careers</a></li>
+            <li><a href="mailto:hello@apaxaa.com" class="hover:text-white">Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-white/40">Legal</div>
+          <ul class="mt-3 space-y-2 text-sm text-white/60">
+            <li><a href="/privacy" class="hover:text-white">Privacy</a></li>
+            <li><a href="/terms" class="hover:text-white">Terms</a></li>
+            <li><a href="/dpa" class="hover:text-white">DPA</a></li>
+            <li><a href="/imprint" class="hover:text-white">Imprint</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center">
+        <p class="text-xs text-white/40">© 2026 Apaxaa Technologies Ltd · RC 9886261. All rights reserved.</p>
+        <p class="text-xs text-white/40">Phaxar — engineering the future of technology.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= SCRIPTS ================= -->
+  <script>
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    reveals.forEach((el) => revealObserver.observe(el));
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const answer = btn.nextElementSibling;
+        const chevron = btn.querySelector('.faq-chevron');
+        const isOpen = answer.classList.contains('open');
+        // close all
+        document.querySelectorAll('.faq-answer').forEach((a) => a.classList.remove('open'));
+        document.querySelectorAll('.faq-chevron').forEach((c) => c.classList.remove('open'));
+        // open clicked if it was closed
+        if (!isOpen) {
+          answer.classList.add('open');
+          chevron.classList.add('open');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
