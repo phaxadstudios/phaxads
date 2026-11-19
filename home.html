@@ -1,610 +1,610 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Phaxar — Describe a website. Watch it go live.</title>
-  <meta name="description" content="Phaxar turns a sentence into a deployed website. AI agents build it, infrastructure hosts it, Rael keeps it safe. A product of Apaxaa." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <style>
-    @font-face {
-      font-family: 'Mona Sans';
-      src: url('https://cdn.jsdelivr.net/gh/github/mona-sans@main/fonts/webfonts/Mona-Sans.woff2') format('woff2');
-      font-weight: 200 900;
-      font-stretch: 75% 125%;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'Hubot Sans';
-      src: url('https://cdn.jsdelivr.net/gh/github/hubot-sans@main/fonts/webfonts/Hubot-Sans.woff2') format('woff2');
-      font-weight: 200 900;
-      font-stretch: 75% 125%;
-      font-display: swap;
-    }
-    :root {
-      --bg: #06060a;
-      --surface: rgba(255,255,255,0.025);
-      --border: rgba(255,255,255,0.09);
-      --text: #f5f5f7;
-      --muted: #8a8a9a;
-      --violet: #8b5cf6;
-      --fuchsia: #d946ef;
-      --cyan: #22d3ee;
-      --green: #34d399;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Mona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-feature-settings: 'ss01', 'ss02';
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-      line-height: 1.5;
-    }
-    h1, h2, h3, .technical {
-      font-family: 'Hubot Sans', 'Mona Sans', sans-serif;
-      letter-spacing: -0.02em;
-    }
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-    .grid-bg {
-      position: absolute; inset: 0; z-index: -1;
-      background-image:
-        linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,0.035) 1px, transparent 1px);
-      background-size: 64px 64px;
-      mask-image: radial-gradient(ellipse 70% 55% at 50% 0%, #000 30%, transparent 100%);
-      -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 0%, #000 30%, transparent 100%);
-    }
-    .glow {
-      position: absolute; border-radius: 9999px; filter: blur(150px);
-      pointer-events: none; z-index: -1; opacity: 0.6;
-    }
-    .gradient-text {
-      background: linear-gradient(100deg, #c4b5fd 0%, #f0abfc 45%, #67e8f9 100%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .glass {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-    }
-    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-    .pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 12px; border-radius: 999px;
-      border: 1px solid var(--border); background: rgba(255,255,255,0.04);
-      font-size: 12px; color: var(--muted); backdrop-filter: blur(8px);
-    }
-    .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
-    .btn-primary {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 13px 26px; border-radius: 12px;
-      background: #fff; color: #000; font-weight: 600; font-size: 14px;
-      border: none; cursor: pointer; text-decoration: none;
-      transition: background .2s, transform .15s;
-    }
-    .btn-primary:hover { background: #e8e8ed; transform: translateY(-1px); }
-    .btn-ghost {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 13px 26px; border-radius: 12px;
-      background: rgba(255,255,255,0.04); color: #fff; font-weight: 500; font-size: 14px;
-      border: 1px solid var(--border); cursor: pointer; text-decoration: none;
-      backdrop-filter: blur(8px); transition: background .2s;
-    }
-    .btn-ghost:hover { background: rgba(255,255,255,0.08); }
-    .terminal {
-      background: #0a0a10; border: 1px solid var(--border);
-      border-radius: 14px; overflow: hidden;
-      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
-      font-size: 12.5px; line-height: 1.8;
-    }
-    .terminal-bar {
-      display: flex; gap: 6px; padding: 12px 14px;
-      border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02);
-    }
-    .terminal-bar span { width: 10px; height: 10px; border-radius: 50%; }
-    .terminal-body { padding: 16px 18px; }
-    .t-keyword { color: #c084fc; }
-    .t-string { color: #86efac; }
-    .t-muted { color: #4a4a5a; }
-    .t-success { color: #34d399; }
-    .t-comment { color: #5a5a6a; font-style: italic; }
-    .stat-num { font-family: 'Hubot Sans', sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
-    .stat-label { font-size: 12px; color: var(--muted); margin-top: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
-    .feature-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 22px; transition: border-color .2s, background .2s;
-    }
-    .feature-card:hover { border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.04); }
-    .icon-box {
-      width: 38px; height: 38px; border-radius: 10px;
-      display: grid; place-items: center;
-      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-      margin-bottom: 14px; color: #c4b5fd;
-    }
-    .faq-item { border-bottom: 1px solid var(--border); }
-    .faq-item:last-child { border-bottom: none; }
-    .faq-q {
-      width: 100%; background: none; border: none; color: var(--text);
-      padding: 18px 20px; text-align: left; font-size: 14px; font-weight: 500;
-      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-      font-family: inherit;
-    }
-    .faq-a { max-height: 0; overflow: hidden; transition: max-height .3s ease; padding: 0 20px; }
-    .faq-a.open { max-height: 200px; padding-bottom: 18px; }
-    .faq-a p { font-size: 13px; color: var(--muted); line-height: 1.7; }
-    .faq-chevron { transition: transform .3s; color: var(--muted); flex-shrink: 0; }
-    .faq-chevron.open { transform: rotate(180deg); }
-    .mobile-menu { display: none; }
-    .mobile-menu.open { display: block; }
-    @media (max-width: 768px) {
-      .hide-mobile { display: none !important; }
-      .stack-mobile { flex-direction: column !important; }
-      .stat-num { font-size: 28px; }
-      h1 { font-size: clamp(2rem, 8vw, 3.5rem) !important; }
-      h2 { font-size: clamp(1.5rem, 5vw, 2.2rem) !important; }
-    }
-    ::selection { background: rgba(139,92,246,0.35); }
-    ::-webkit-scrollbar { width: 10px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: #22222e; border-radius: 5px; }
-    ::-webkit-scrollbar-thumb:hover { background: #33333f; }
-    .ecosystem-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 4px 10px; border-radius: 6px;
-      font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
-      text-transform: uppercase; border: 1px solid var(--border);
-    }
-    .pipeline-node {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px; border-radius: 10px;
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-      font-size: 12px; white-space: nowrap;
-    }
-    .pipeline-arrow { color: #33333f; font-size: 16px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phaxar — Describe a website. Watch it go live.</title>
+<meta name="description" content="Phaxar turns a sentence into a deployed website. AI agents build it, edge infrastructure hosts it, Rael keeps it safe. Built for Nigerian businesses, part of the Apaxaa ecosystem." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#050508;
+  --bg-2:#08080e;
+  --ink:#f4f4f6;
+  --muted:#8b8b9a;
+  --dim:#5a5a6a;
+  --line:rgba(255,255,255,0.08);
+  --line-2:rgba(255,255,255,0.14);
+  --violet:#8b5cf6;
+  --fuchsia:#e879f9;
+  --cyan:#22d3ee;
+  --green:#34d399;
+  --serif:'Sora','Geist',-apple-system,BlinkMacSystemFont,sans-serif; /* headline font */
+  --sans:'Geist',-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:'Geist Mono','SF Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-weight:400;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:rgba(139,92,246,.35)}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#1e1e2a;border-radius:5px}
+::-webkit-scrollbar-thumb:hover{background:#2a2a3a}
+
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px;position:relative}
+
+/* ---------- grain + mesh ---------- */
+.grain{
+  position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.mesh{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+.mesh::before,.mesh::after{content:'';position:absolute;border-radius:50%;filter:blur(120px);opacity:.5}
+.mesh::before{width:640px;height:640px;left:50%;top:-220px;transform:translateX(-50%);background:radial-gradient(circle,rgba(139,92,246,.5),transparent 70%)}
+.mesh::after{width:520px;height:520px;right:-120px;top:120px;background:radial-gradient(circle,rgba(232,121,249,.32),transparent 70%)}
+
+/* ---------- nav ---------- */
+.nav-outer{position:fixed;top:0;left:0;right:0;z-index:100;transition:all .3s}
+.nav-outer.scrolled{background:rgba(5,5,8,.72);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit}
+.brand-mark{width:34px;height:34px;border-radius:9px;background:conic-gradient(from 180deg,#8b5cf6,#e879f9,#22d3ee,#8b5cf6);display:grid;place-items:center;box-shadow:0 0 24px rgba(139,92,246,.5)}
+.brand-mark svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.2}
+.brand-name{font-family:var(--serif);font-size:21px;font-weight:700;letter-spacing:-.03em}
+.brand-tag{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line);padding:3px 8px;border-radius:5px;margin-left:2px}
+.nav-links{display:flex;gap:34px}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:450;transition:color .2s}
+.nav-links a:hover{color:var(--ink)}
+.nav-cta{display:flex;align-items:center;gap:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--sans);font-weight:550;font-size:14px;border:none;border-radius:11px;cursor:pointer;text-decoration:none;transition:all .2s;white-space:nowrap}
+.btn-primary{background:#fff;color:#000;padding:11px 20px;box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 8px 30px rgba(255,255,255,.08)}
+.btn-primary:hover{background:#e8e8ee;transform:translateY(-1px);box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 12px 40px rgba(255,255,255,.14)}
+.btn-ghost{background:rgba(255,255,255,.045);color:var(--ink);padding:11px 20px;border:1px solid var(--line-2);backdrop-filter:blur(10px)}
+.btn-ghost:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.24)}
+.btn-lg{padding:15px 28px;font-size:15px;border-radius:13px}
+.btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.link-quiet{color:var(--muted);text-decoration:none;font-size:13.5px;transition:color .2s}
+.link-quiet:hover{color:var(--ink)}
+.menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:9px;padding:8px;color:var(--ink);cursor:pointer}
+.mobile-menu{display:none}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:170px 0 80px;overflow:hidden}
+#particles{position:absolute;inset:0;z-index:-1;opacity:.5}
+.hero-badge{display:inline-flex;align-items:center;gap:9px;padding:6px 14px;border-radius:999px;border:1px solid var(--line-2);background:rgba(255,255,255,.035);font-size:12px;color:var(--muted);margin-bottom:30px;backdrop-filter:blur(10px)}
+.hero-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+.hero h1{font-family:var(--serif);font-weight:700;font-size:clamp(2.6rem,6.6vw,5.6rem);line-height:1.02;letter-spacing:-.05em;max-width:1000px;margin:0 auto}
+.hero h1 em{font-style:normal;background:linear-gradient(100deg,#c4b5fd,#e879f9 45%,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lede{max-width:600px;margin:30px auto 0;font-size:17px;line-height:1.7;color:var(--muted)}
+.hero p.lede strong{color:#c4b5fd;font-weight:550}
+.hero-actions{display:flex;gap:13px;justify-content:center;margin-top:38px;flex-wrap:wrap}
+.hero-note{margin-top:20px;font-size:12px;color:var(--dim);letter-spacing:.01em}
+
+/* ---------- terminal ---------- */
+.terminal-wrap{position:relative;max-width:940px;margin:72px auto 0}
+.terminal-wrap::before{
+  content:'';position:absolute;inset:-2px;border-radius:22px;z-index:-1;
+  background:conic-gradient(from 0deg,transparent,rgba(139,92,246,.6),rgba(232,121,249,.5),transparent 65%);
+  animation:spin 8s linear infinite;filter:blur(14px);opacity:.7;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.terminal{background:#0a0a11;border:1px solid var(--line-2);border-radius:20px;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04) inset}
+.term-bar{display:flex;align-items:center;gap:7px;padding:14px 18px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.018)}
+.term-bar i{width:11px;height:11px;border-radius:50%;display:block}
+.term-bar i:nth-child(1){background:#ff5f57}.term-bar i:nth-child(2){background:#febc2e}.term-bar i:nth-child(3){background:#28c840}
+.term-title{margin-left:14px;font-family:var(--mono);font-size:11px;color:var(--dim)}
+.term-body{padding:26px 24px;font-family:var(--mono);font-size:13px;line-height:1.95}
+.term-body .c{color:#4a4a5c;font-style:italic}
+.term-body .k{color:#c084fc}
+.term-body .s{color:#86efac}
+.term-body .m{color:#3f3f50}
+.term-body .ok{color:var(--green)}
+.cursor{display:inline-block;width:8px;height:15px;background:#c4b5fd;vertical-align:-2px;animation:blink 1.1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- stats ---------- */
+.stats{max-width:900px;margin:72px auto 0;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.022);backdrop-filter:blur(14px);display:grid;grid-template-columns:repeat(4,1fr);overflow:hidden}
+.stat{padding:26px 18px;text-align:center;border-right:1px solid var(--line)}
+.stat:last-child{border-right:none}
+.stat b{display:block;font-family:var(--serif);font-size:34px;font-weight:700;letter-spacing:-.04em;line-height:1;background:linear-gradient(120deg,#c4b5fd,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{display:block;margin-top:8px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+
+/* ---------- section shell ---------- */
+.sec{padding:110px 0;position:relative}
+.sec-head{text-align:center;max-width:640px;margin:0 auto 60px}
+.kicker{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#a78bfa;margin-bottom:16px;padding:5px 12px;border:1px solid rgba(139,92,246,.25);border-radius:6px;background:rgba(139,92,246,.07)}
+.sec-head h2{font-family:var(--serif);font-weight:700;font-size:clamp(1.9rem,3.8vw,2.9rem);line-height:1.1;letter-spacing:-.045em}
+.sec-head p{margin-top:16px;color:var(--muted);font-size:15.5px;line-height:1.7}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--line-2),transparent)}
+
+/* ---------- pipeline ---------- */
+.pipe{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pipe-node{display:flex;align-items:center;gap:9px;padding:12px 16px;border-radius:11px;background:rgba(255,255,255,.03);border:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:#b8b8c8;position:relative;overflow:hidden}
+.pipe-node svg{width:14px;height:14px;stroke:#c4b5fd;fill:none;stroke-width:2}
+.pipe-node.live{border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.06)}
+.pipe-node.live svg{stroke:var(--green)}
+.pipe-node::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(139,92,246,.18),transparent);animation:sweep 3s linear infinite}
+@keyframes sweep{to{left:100%}}
+.pipe-arrow{color:#2a2a3a;font-size:15px;font-family:var(--mono)}
+
+/* ---------- three paths ---------- */
+.paths{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.path{position:relative;border:1px solid var(--line);border-radius:20px;padding:30px 26px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008));transition:all .3s;overflow:hidden}
+.path::before{content:'';position:absolute;inset:0;border-radius:20px;padding:1px;background:linear-gradient(160deg,rgba(139,92,246,.5),transparent 40%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s}
+.path:hover{transform:translateY(-5px);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.012))}
+.path:hover::before{opacity:1}
+.path-ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;margin-bottom:20px;background:linear-gradient(140deg,rgba(139,92,246,.22),rgba(232,121,249,.12));border:1px solid rgba(139,92,246,.3)}
+.path-ico svg{width:20px;height:20px;stroke:#d8b4fe;fill:none;stroke-width:1.9}
+.path-tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line);padding:3px 8px;border-radius:5px;display:inline-block;margin-bottom:14px}
+.path h3{font-size:18px;font-weight:600;margin-bottom:9px;letter-spacing:-.01em}
+.path p{font-size:13.5px;color:var(--muted);line-height:1.7}
+.path-foot{margin-top:20px;font-family:var(--mono);font-size:11.5px;color:#a78bfa;opacity:0;transform:translateX(-4px);transition:all .25s}
+.path:hover .path-foot{opacity:1;transform:translateX(0)}
+
+/* ---------- steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:8px}
+.step{position:relative;padding-left:0}
+.step-n{font-family:var(--serif);font-weight:800;letter-spacing:-.04em;font-size:60px;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(139,92,246,.35);margin-bottom:14px}
+.step h3{font-size:16px;font-weight:600;margin-bottom:8px}
+.step p{font-size:13.5px;color:var(--muted);line-height:1.7}
+.step-line{position:absolute;top:38px;left:70px;right:-24px;height:1px;background:linear-gradient(90deg,rgba(139,92,246,.3),transparent)}
+.step:last-child .step-line{display:none}
+
+/* ---------- comparison ---------- */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-top:8px}
+.compare-col{padding:34px 30px}
+.compare-col.bad{background:rgba(255,255,255,.015);border-right:1px solid var(--line)}
+.compare-col.good{background:linear-gradient(160deg,rgba(139,92,246,.09),rgba(34,211,238,.03))}
+.compare-col h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:20px}
+.compare-col.good h4{color:#c4b5fd}
+.compare-col ul{list-style:none;display:flex;flex-direction:column;gap:13px}
+.compare-col li{display:flex;gap:11px;font-size:13.5px;color:#b0b0c0;line-height:1.55}
+.compare-col li svg{width:16px;height:16px;flex-shrink:0;margin-top:2px;stroke-width:2.2;fill:none}
+.compare-col.bad li svg{stroke:#5a5a6a}
+.compare-col.good li svg{stroke:var(--green)}
+
+/* ---------- ecosystem ---------- */
+.eco{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+.eco-card{border-radius:18px;padding:26px 24px;border:1px solid var(--line);position:relative;overflow:hidden;background:rgba(255,255,255,.02)}
+.eco-card::before{content:'';position:absolute;width:180px;height:180px;border-radius:50%;filter:blur(70px);top:-60px;right:-40px;opacity:.5}
+.eco-card.rael::before{background:#8b5cf6}
+.eco-card.joyet::before{background:#34d399}
+.eco-card.candle::before{background:#22d3ee}
+.eco-badge{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:6px;margin-bottom:16px;border:1px solid var(--line-2)}
+.eco-card.rael .eco-badge{color:#c4b5fd;border-color:rgba(139,92,246,.35)}
+.eco-card.joyet .eco-badge{color:#6ee7b7;border-color:rgba(52,211,153,.35)}
+.eco-card.candle .eco-badge{color:#67e8f9;border-color:rgba(34,211,238,.35)}
+.eco-card h3{font-size:15px;font-weight:600;margin-bottom:7px}
+.eco-card p{font-size:12.5px;color:var(--muted);line-height:1.7}
+
+/* ---------- pricing ---------- */
+.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch;margin-top:8px}
+.plan{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:20px;padding:32px 28px;background:rgba(255,255,255,.022)}
+.plan.featured{border-color:rgba(139,92,246,.4);background:linear-gradient(180deg,rgba(139,92,246,.09),rgba(255,255,255,.01));position:relative;box-shadow:0 0 60px rgba(139,92,246,.12)}
+.plan-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#8b5cf6,#e879f9);padding:5px 16px;border-radius:999px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;white-space:nowrap}
+.plan-name{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+.plan-price{font-family:var(--serif);font-size:40px;font-weight:700;line-height:1;letter-spacing:-.045em}
+.plan-price small{font-family:var(--sans);font-size:12px;color:var(--dim);letter-spacing:0;margin-left:5px}
+.plan-desc{font-size:12.5px;color:var(--muted);margin-top:8px}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:11px;margin:24px 0;flex:1}
+.plan li{display:flex;gap:9px;font-size:13px;color:#b8b8c8;line-height:1.5}
+.plan li svg{width:15px;height:15px;flex-shrink:0;margin-top:2px;stroke:var(--green);fill:none;stroke-width:2.5}
+.plan .btn{width:100%}
+.pricing-note{text-align:center;font-size:11.5px;color:var(--dim);margin-top:28px}
+
+/* ---------- developer ---------- */
+.dev{border:1px solid var(--line);border-radius:24px;padding:44px 40px;background:linear-gradient(140deg,rgba(139,92,246,.08),rgba(34,211,238,.03) 60%,transparent);position:relative;overflow:hidden}
+.dev::before{content:'';position:absolute;width:300px;height:300px;border-radius:50%;background:#8b5cf6;filter:blur(120px);opacity:.28;top:-80px;right:-60px}
+.dev-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;position:relative}
+.dev h2{font-family:var(--serif);font-weight:700;font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.12;letter-spacing:-.045em}
+.dev p{color:var(--muted);font-size:14px;line-height:1.75;margin-top:14px;max-width:420px}
+.dev-actions{display:flex;gap:11px;margin-top:26px;flex-wrap:wrap}
+
+/* ---------- faq ---------- */
+.faq{max-width:720px;margin:0 auto;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:rgba(255,255,255,.018)}
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{width:100%;background:none;border:none;color:var(--ink);text-align:left;padding:20px 24px;font-size:14.5px;font-weight:500;font-family:inherit;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;transition:background .2s}
+.faq-q:hover{background:rgba(255,255,255,.02)}
+.faq-q svg{width:16px;height:16px;stroke:var(--dim);fill:none;stroke-width:2;flex-shrink:0;transition:transform .3s}
+.faq-q.open svg{transform:rotate(180deg);stroke:#c4b5fd}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.faq-a.open{max-height:240px}
+.faq-a p{padding:0 24px 20px;font-size:13.5px;color:var(--muted);line-height:1.75}
+
+/* ---------- final cta ---------- */
+.cta{max-width:780px;margin:0 auto;text-align:center;border:1px solid var(--line);border-radius:26px;padding:64px 40px;background:linear-gradient(150deg,rgba(139,92,246,.14),rgba(232,121,249,.06) 50%,rgba(34,211,238,.04));position:relative;overflow:hidden}
+.cta::before{content:'';position:absolute;width:340px;height:340px;border-radius:50%;background:#8b5cf6;filter:blur(130px);opacity:.35;top:-120px;left:50%;transform:translateX(-50%)}
+.cta h2{font-family:var(--serif);font-weight:700;font-size:clamp(1.9rem,3.8vw,2.8rem);line-height:1.1;letter-spacing:-.045em;position:relative}
+.cta p{color:var(--muted);font-size:15px;margin-top:14px;position:relative}
+.cta-actions{display:flex;gap:13px;justify-content:center;margin-top:32px;flex-wrap:wrap;position:relative}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:56px 0 40px;margin-top:40px}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px}
+.foot-brand p{font-size:12px;color:var(--dim);line-height:1.75;max-width:260px;margin-top:14px}
+.foot-col h5{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:16px}
+.foot-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.foot-col a{font-size:12.5px;color:var(--muted);text-decoration:none;transition:color .2s}
+.foot-col a:hover{color:var(--ink)}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:44px;padding-top:22px;border-top:1px solid var(--line);flex-wrap:wrap;gap:10px}
+.foot-bottom p{font-size:11px;color:#3a3a4a}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
+.reveal.in{opacity:1;transform:translateY(0)}
+
+/* ---------- mobile ---------- */
+@media(max-width:920px){
+  .nav-links,.nav-cta .link-quiet{display:none}
+  .menu-btn{display:block}
+  .mobile-menu{display:none;position:fixed;top:72px;left:16px;right:16px;z-index:99;background:rgba(8,8,14,.96);border:1px solid var(--line-2);border-radius:16px;padding:20px;backdrop-filter:blur(20px)}
+  .mobile-menu.open{display:block}
+  .mobile-menu a{display:block;padding:12px 0;color:var(--muted);text-decoration:none;font-size:14px;border-bottom:1px solid var(--line)}
+  .mobile-menu a:last-child{border-bottom:none;margin-top:8px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stat:nth-child(2){border-right:none}
+  .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--line)}
+  .paths,.steps,.eco,.pricing{grid-template-columns:1fr}
+  .compare{grid-template-columns:1fr}
+  .compare-col.bad{border-right:none;border-bottom:1px solid var(--line)}
+  .dev-grid{grid-template-columns:1fr;gap:32px}
+  .dev{padding:32px 24px}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:32px}
+  .step-line{display:none}
+  .hero{padding:140px 0 60px}
+}
+@media(max-width:520px){
+  .wrap{padding:0 18px}
+  .brand-tag{display:none}
+  .foot-grid{grid-template-columns:1fr}
+  .cta{padding:44px 24px}
+}
+</style>
 </head>
 <body>
 
-<!-- ================= NAVBAR ================= -->
-<header style="position: fixed; top: 0; left: 0; right: 0; z-index: 100;">
-  <div class="container" style="padding-top: 14px;">
-    <nav class="glass" style="display: flex; align-items: center; justify-content: space-between; border-radius: 16px; padding: 10px 18px;">
-      <a href="#" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
-        <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #8b5cf6, #d946ef); display: grid; place-items: center;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-        </div>
-        <span style="font-family: 'Hubot Sans'; font-weight: 700; font-size: 17px; letter-spacing: -0.02em;">Phaxar</span>
-        <span style="font-size: 10px; color: var(--muted); border: 1px solid var(--border); border-radius: 5px; padding: 2px 7px; letter-spacing: 0.04em;">by Apaxaa</span>
+<div class="grain"></div>
+
+<!-- NAV -->
+<div class="nav-outer" id="navOuter">
+  <div class="wrap">
+    <nav class="nav">
+      <a href="#" class="brand">
+        <div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="brand-name">Phaxar</span>
+        <span class="brand-tag">by Apaxaa</span>
       </a>
-      <div class="hide-mobile" style="display: flex; align-items: center; gap: 28px;">
-        <a href="#product" style="font-size: 13px; color: var(--muted); text-decoration: none;">Product</a>
-        <a href="#how" style="font-size: 13px; color: var(--muted); text-decoration: none;">How it works</a>
-        <a href="#pricing" style="font-size: 13px; color: var(--muted); text-decoration: none;">Pricing</a>
-        <a href="#developers" style="font-size: 13px; color: var(--muted); text-decoration: none;">Developers</a>
+      <div class="nav-links">
+        <a href="#product">Product</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#developers">Developers</a>
       </div>
-      <div class="hide-mobile" style="display: flex; align-items: center; gap: 12px;">
-        <a href="/login" style="font-size: 13px; color: var(--muted); text-decoration: none;">Sign in</a>
-        <a href="/new" class="btn-primary" style="padding: 9px 18px; font-size: 13px;">Start free
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-        </a>
+      <div class="nav-cta">
+        <a href="/login" class="link-quiet">Sign in</a>
+        <a href="/new" class="btn btn-primary">Start free <svg viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <button class="menu-btn" id="menuBtn" aria-label="Menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
       </div>
-      <button id="menuBtn" class="hide-mobile" style="display: none; background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px; cursor: pointer; color: #fff;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
     </nav>
-    <div id="mobileMenu" class="mobile-menu glass" style="margin-top: 8px; border-radius: 14px; padding: 16px;">
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-        <a href="#product" style="font-size: 14px; color: var(--muted); text-decoration: none;">Product</a>
-        <a href="#how" style="font-size: 14px; color: var(--muted); text-decoration: none;">How it works</a>
-        <a href="#pricing" style="font-size: 14px; color: var(--muted); text-decoration: none;">Pricing</a>
-        <a href="#developers" style="font-size: 14px; color: var(--muted); text-decoration: none;">Developers</a>
-        <a href="/new" class="btn-primary" style="margin-top: 6px;">Start free</a>
-      </div>
-    </div>
   </div>
-</header>
+</div>
 
-<!-- ================= HERO ================= -->
-<section style="position: relative; padding: 160px 0 60px; overflow: hidden;">
-  <div class="grid-bg"></div>
-  <div class="glow" style="left: 50%; top: -80px; width: 700px; height: 500px; transform: translateX(-50%); background: rgba(139,92,246,0.22);"></div>
-  <div class="glow" style="right: 10%; top: 120px; width: 300px; height: 300px; background: rgba(217,70,239,0.16);"></div>
-  <div class="glow" style="left: 8%; top: 200px; width: 260px; height: 260px; background: rgba(34,211,238,0.10);"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#product">Product</a>
+  <a href="#how">How it works</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#developers">Developers</a>
+  <a href="/new" class="btn btn-primary" style="width:100%">Start free</a>
+</div>
 
-  <div class="container" style="text-align: center; position: relative;">
-    <div class="pill" style="margin-bottom: 24px;">
-      <span class="dot"></span>
-      A product of Apaxaa · Built in Enugu · RC 9886261
-    </div>
-
-    <h1 style="font-size: clamp(2.8rem, 6vw, 4.8rem); font-weight: 800; line-height: 1.02; max-width: 900px; margin: 0 auto; letter-spacing: -0.035em;">
-      Describe a website.
-      <br />
-      <span class="gradient-text">Watch it go live.</span>
-    </h1>
-
-    <p style="max-width: 620px; margin: 24px auto 0; font-size: 16px; line-height: 1.7; color: var(--muted);">
-      Phaxar turns a sentence into a deployed website. AI agents build it,
-      infrastructure hosts it, and <strong style="color:#c4b5fd;">Rael</strong> keeps it safe.
-      Or bring your own code — GitHub, zip, whatever. One platform, three ways to ship.
-    </p>
-
-    <div style="display: flex; gap: 12px; justify-content: center; margin-top: 36px; flex-wrap: wrap;">
-      <a href="/new" class="btn-primary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+<!-- HERO -->
+<section class="hero">
+  <canvas id="particles"></canvas>
+  <div class="mesh"></div>
+  <div class="wrap" style="text-align:center;position:relative">
+    <div class="hero-badge"><span class="dot"></span> A product of Apaxaa · Built in Enugu · RC 9886261</div>
+    <h1>Describe a website.<br><em>Watch it go live.</em></h1>
+    <p class="lede">Phaxar turns a sentence into a deployed website. AI agents write it, edge infrastructure hosts it, and <strong>Rael</strong> keeps it safe. Or bring your own code — GitHub, zip, whatever. <strong>Built for Nigerian businesses.</strong></p>
+    <div class="hero-actions">
+      <a href="/new" class="btn btn-primary btn-lg">
+        <svg viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Build my site free
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <a href="#how" class="btn-ghost">See how it works</a>
+      <a href="#how" class="btn btn-ghost btn-lg">See how it works</a>
     </div>
-
-    <p style="margin-top: 18px; font-size: 12px; color: #5a5a6a;">
-      No credit card · 3 free generations · First site live in under a minute
-    </p>
+    <p class="hero-note">No credit card · 3 free generations · First site live in under a minute</p>
   </div>
 
-  <!-- Hero terminal mock -->
-  <div class="container" style="margin-top: 56px; max-width: 900px;">
-    <div class="terminal" style="box-shadow: 0 40px 120px rgba(139,92,246,0.12);">
-      <div class="terminal-bar">
-        <span style="background:#ff5f57;"></span>
-        <span style="background:#febc2e;"></span>
-        <span style="background:#28c840;"></span>
-        <span style="margin-left: 12px; font-size: 11px; color: #4a4a5a; font-family: 'Mona Sans';">phaxar.xyz / new</span>
-      </div>
-      <div class="terminal-body">
-        <div><span class="t-comment">// user prompt</span></div>
-        <div><span class="t-string">"A landing page for my coffee shop in Enugu. Warm colors, menu, hours, WhatsApp button."</span></div>
-        <div style="margin-top: 14px;"><span class="t-keyword">→</span> Agent generating… <span class="t-muted">(claude-sonnet-5)</span></div>
-        <div><span class="t-keyword">→</span> Validating in sandbox… <span class="t-success">✓ secure</span></div>
-        <div><span class="t-keyword">→</span> Building static site… <span class="t-success">done in 4.2s</span></div>
-        <div><span class="t-keyword">→</span> Deploying to edge network…</div>
-        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-          <span class="t-success">✓ Live at https://enugu-coffee.phaxar.xyz</span>
+  <!-- TERMINAL -->
+  <div class="wrap">
+    <div class="terminal-wrap">
+      <div class="terminal">
+        <div class="term-bar"><i></i><i></i><i></i><span class="term-title">phaxar.xyz / new</span></div>
+        <div class="term-body">
+          <div class="c">// your prompt</div>
+          <div><span class="s">"A landing page for my coffee shop in Enugu. Warm colors, menu, hours, WhatsApp order button, Paystack checkout."</span></div>
+          <div style="margin-top:16px"><span class="k">→</span> agent generating <span class="m">(claude-sonnet-5-5)</span></div>
+          <div><span class="k">→</span> structured output validated <span class="ok">✓</span></div>
+          <div><span class="k">→</span> sandbox render check <span class="ok">✓ secure</span></div>
+          <div><span class="k">→</span> building static bundle <span class="ok">done in 4.2s</span></div>
+          <div><span class="k">→</span> edge deploy · SSL · Rael scan</div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)">
+            <span class="ok">✓ Live at https://enugu-coffee.phaxar.xyz</span> <span class="cursor"></span>
+          </div>
+          <div class="m">0 vulnerabilities · 0 forms collecting passwords · WhatsApp + Paystack wired</div>
         </div>
-        <div class="t-muted">SSL issued · Rael scan passed · 0 vulnerabilities</div>
       </div>
     </div>
   </div>
 
-  <!-- Stats bar -->
-  <div class="container" style="margin-top: 64px; max-width: 800px;">
-    <div class="glass" style="border-radius: 16px; padding: 28px 20px; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
-      <div style="text-align: center;">
-        <div class="stat-num gradient-text">60s</div>
-        <div class="stat-label">Prompt to live</div>
+  <!-- STATS -->
+  <div class="wrap">
+    <div class="stats reveal">
+      <div class="stat"><b>60s</b><span>Prompt to live</span></div>
+      <div class="stat"><b>3</b><span>Deploy paths</span></div>
+      <div class="stat"><b>100%</b><span>Free SSL</span></div>
+      <div class="stat"><b>₦0</b><span>To start</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- PIPELINE -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">Under the hood</span>
+      <h2>Every deploy follows the same pipeline.</h2>
+      <p>Whether it came from a prompt, a repo, or a zip — the path to production is identical, and every stage is gated.</p>
+    </div>
+    <div class="pipe reveal">
+      <div class="pipe-node"><svg viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" stroke-linecap="round" stroke-linejoin="round"/></svg> Prompt / Repo / Zip</div>
+      <span class="pipe-arrow">→</span>
+      <div class="pipe-node"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Sandbox validate</div>
+      <span class="pipe-arrow">→</span>
+      <div class="pipe-node"><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Build</div>
+      <span class="pipe-arrow">→</span>
+      <div class="pipe-node"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg> Edge deploy</div>
+      <span class="pipe-arrow">→</span>
+      <div class="pipe-node live"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Live URL</div>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:30px;display:flex;justify-content:center;gap:28px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--dim)">
+      <span>✓ SSL auto-issued</span><span>✓ Rael scan</span><span>✓ Global CDN</span><span>✓ Custom domain</span><span>✓ Instant rollback</span>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- THREE PATHS -->
+<section class="sec" id="product">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">Three ways to ship</span>
+      <h2>One platform. Every kind of builder.</h2>
+      <p>Whether you write code every day or have never opened a terminal, Phaxar meets you where you are.</p>
+    </div>
+    <div class="paths">
+      <div class="path reveal">
+        <div class="path-ico"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M12 8V4M8 4h8"/><circle cx="8.5" cy="14" r="1" fill="currentColor"/><circle cx="15.5" cy="14" r="1" fill="currentColor"/></svg></div>
+        <span class="path-tag">AI Agent</span>
+        <h3>Describe it. Ship it.</h3>
+        <p>Tell Phaxar what you want in plain English. The agent writes the code, validates it in a sandbox, and deploys it live — in under a minute.</p>
+        <div class="path-foot">claude-sonnet-5-5 →</div>
       </div>
-      <div style="width: 1px; background: var(--border);" class="hide-mobile"></div>
-      <div style="text-align: center;">
-        <div class="stat-num gradient-text">3</div>
-        <div class="stat-label">Deploy paths</div>
+      <div class="path reveal">
+        <div class="path-ico"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg></div>
+        <span class="path-tag">GitHub</span>
+        <h3>Bring your repo.</h3>
+        <p>Connect a single repository with a read-only GitHub App. We build and deploy on every push. No broad account access, no long-lived tokens.</p>
+        <div class="path-foot">fine-grained · read-only →</div>
       </div>
-      <div style="width: 1px; background: var(--border);" class="hide-mobile"></div>
-      <div style="text-align: center;">
-        <div class="stat-num gradient-text">100%</div>
-        <div class="stat-label">Free SSL</div>
-      </div>
-      <div style="width: 1px; background: var(--border);" class="hide-mobile"></div>
-      <div style="text-align: center;">
-        <div class="stat-num gradient-text">₦0</div>
-        <div class="stat-label">To start</div>
+      <div class="path reveal">
+        <div class="path-ico"><svg viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.9A5 5 0 1115.9 6h.1a5 5 0 011.9 9.6M12 12v9m0-9l-3 3m3-3l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="path-tag">Manual</span>
+        <h3>Drop your files.</h3>
+        <p>No Git? No problem. Drag a folder or a zip. We handle the build, SSL, CDN, and give you a live link instantly.</p>
+        <div class="path-foot">zip · folder · single HTML →</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= PIPELINE VISUAL ================= -->
-<section style="padding: 80px 0; position: relative;">
-  <div class="container">
-    <div class="reveal" style="text-align: center; margin-bottom: 48px;">
-      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #a78bfa; margin-bottom: 12px;">Under the hood</div>
-      <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700;">Every deploy follows the same pipeline.</h2>
-      <p style="color: var(--muted); font-size: 14px; margin-top: 10px; max-width: 500px; margin-left: auto; margin-right: auto;">Whether it came from a prompt, a repo, or a zip — the path to production is identical.</p>
+<!-- STEPS -->
+<section class="sec" id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">How it works</span>
+      <h2>Three steps. No setup.</h2>
     </div>
-
-    <div class="reveal" style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 0 20px;">
-      <div class="pipeline-node"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg> Prompt / Repo / Zip</div>
-      <span class="pipeline-arrow">→</span>
-      <div class="pipeline-node"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Sandbox validate</div>
-      <span class="pipeline-arrow">→</span>
-      <div class="pipeline-node"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Build</div>
-      <span class="pipeline-arrow">→</span>
-      <div class="pipeline-node"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg> Edge deploy</div>
-      <span class="pipeline-arrow">→</span>
-      <div class="pipeline-node" style="border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.06);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg> Live URL</div>
-    </div>
-
-    <div class="reveal" style="text-align: center; margin-top: 32px; display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; font-size: 11px; color: #5a5a6a;">
-      <span>✓ SSL auto-issued</span>
-      <span>✓ Rael security scan</span>
-      <span>✓ Global CDN</span>
-      <span>✓ Custom domain ready</span>
-    </div>
-  </div>
-</section>
-
-<!-- ================= THREE PATHS ================= -->
-<section id="product" style="padding: 100px 0; position: relative;">
-  <div class="container">
-    <div class="reveal" style="text-align: center; margin-bottom: 56px;">
-      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #a78bfa; margin-bottom: 12px;">Three ways to ship</div>
-      <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700;">One platform. Every kind of builder.</h2>
-      <p style="color: var(--muted); font-size: 14px; margin-top: 10px; max-width: 520px; margin-left: auto; margin-right: auto;">Whether you write code every day or have never opened a terminal, Phaxar meets you where you are.</p>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-      <!-- AI -->
-      <div class="reveal feature-card" style="position: relative;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
-          <div class="icon-box" style="margin-bottom: 0;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M12 8V4M8 4h8"/><circle cx="8.5" cy="14" r="1" fill="currentColor"/><circle cx="15.5" cy="14" r="1" fill="currentColor"/></svg>
-          </div>
-          <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 3px 8px; border-radius: 5px;">AI Agent</span>
-        </div>
-        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">Describe it. Ship it.</h3>
-        <p style="font-size: 13px; color: var(--muted); line-height: 1.7;">Tell Phaxar what you want in plain English. Our AI agent writes the code, validates it in a sandbox, and deploys it live — in under 60 seconds.</p>
-        <div style="margin-top: 16px; font-size: 12px; color: #a78bfa; opacity: 0; transition: opacity .2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">Powered by Claude Sonnet 5 →</div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-n">01</div>
+        <h3>Describe it</h3>
+        <p>Type what you want — a shop, a salon, a church page, a landing page. Plain English. No templates to pick.</p>
+        <div class="step-line"></div>
       </div>
-
-      <!-- GitHub -->
-      <div class="reveal feature-card" style="position: relative;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
-          <div class="icon-box" style="margin-bottom: 0;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
-          </div>
-          <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 3px 8px; border-radius: 5px;">GitHub</span>
-        </div>
-        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">Bring your repo.</h3>
-        <p style="font-size: 13px; color: var(--muted); line-height: 1.7;">Already have a codebase? Connect GitHub with a read-only token. We build and deploy on every push. No Vercel account needed.</p>
-        <div style="margin-top: 16px; font-size: 12px; color: #a78bfa; opacity: 0; transition: opacity .2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">Read-only token · <24h expiry →</div>
+      <div class="step reveal">
+        <div class="step-n">02</div>
+        <h3>Watch it build</h3>
+        <p>The agent writes the code, validates it in a sandbox, and scans it with Rael before anything goes live.</p>
+        <div class="step-line"></div>
       </div>
-
-      <!-- Manual -->
-      <div class="reveal feature-card" style="position: relative;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
-          <div class="icon-box" style="margin-bottom: 0;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16a4 4 0 01-.88-7.9A5 5 0 1115.9 6h.1a5 5 0 011.9 9.6M12 12v9m0-9l-3 3m3-3l3 3"/></svg>
-          </div>
-          <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 3px 8px; border-radius: 5px;">Manual</span>
-        </div>
-        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">Drop your files.</h3>
-        <p style="font-size: 13px; color: var(--muted); line-height: 1.7;">No Git? No problem. Drag a folder or a zip. We handle the build, SSL, CDN, and give you a live link instantly.</p>
-        <div style="margin-top: 16px; font-size: 12px; color: #a78bfa; opacity: 0; transition: opacity .2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">Zip, folder, or single HTML file →</div>
+      <div class="step reveal">
+        <div class="step-n">03</div>
+        <h3>It's live</h3>
+        <p>You get a URL instantly. Add a custom domain, wire WhatsApp and Paystack, or hand it to a developer.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= WHAT SHIPS WITH EVERY SITE ================= -->
-<section style="padding: 40px 0 80px;">
-  <div class="container">
-    <div class="reveal glass" style="border-radius: 18px; padding: 28px 24px;">
-      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; text-align: center;">Ships with every site, on every plan</div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 18px; text-align: center;">
-        <div>
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Automatic SSL</div>
-          <div style="font-size: 11px; color: var(--muted);">HTTPS, zero config</div>
-        </div>
-        <div>
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Global CDN</div>
-          <div style="font-size: 11px; color: var(--muted);">Fast from Lagos to London</div>
-        </div>
-        <div>
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Rael security scan</div>
-          <div style="font-size: 11px; color: var(--muted);">Before every deploy</div>
-        </div>
-        <div>
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Free subdomain</div>
-          <div style="font-size: 11px; color: var(--muted);">yourname.phaxar.xyz</div>
-        </div>
-        <div>
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Instant rollback</div>
-          <div style="font-size: 11px; color: var(--muted);">One click, any deploy</div>
-        </div>
-      </div>
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- COMPARISON -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">The difference</span>
+      <h2>Built for how Nigerians actually sell.</h2>
+      <p>Generic AI site builders give you a pretty page. Phaxar gives you a page that takes orders.</p>
     </div>
-  </div>
-</section>
-
-<!-- ================= FEATURES ================= -->
-<section id="how" style="padding: 80px 0 100px;">
-  <div class="container">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px; align-items: center;">
-      <div class="reveal">
-        <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #67e8f9; margin-bottom: 12px;">Why Phaxar</div>
-        <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700; line-height: 1.15;">Infrastructure-grade hosting,<br/>without the infrastructure.</h2>
-        <p style="color: var(--muted); font-size: 14px; line-height: 1.7; margin-top: 14px; max-width: 440px;">Every site on Phaxar runs on the same edge network that powers some of the world's largest platforms. You get the performance without the ops.</p>
-        <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px; font-size: 12.5px; color: var(--muted);">
-          <div style="display: flex; align-items: center; gap: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg> Environment variables, encrypted at rest</div>
-          <div style="display: flex; align-items: center; gap: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg> Build logs streamed in real time</div>
-          <div style="display: flex; align-items: center; gap: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg> Preview deployments for every branch</div>
-        </div>
-      </div>
-
-      <div style="display: grid; gap: 14px;">
-        <div class="reveal feature-card" style="display: flex; gap: 16px; align-items: flex-start;">
-          <div class="icon-box" style="flex-shrink: 0;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-          </div>
-          <div>
-            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Live in 60 seconds</h3>
-            <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">From prompt to production URL. No DNS wait, no config files, no cold starts.</p>
-          </div>
-        </div>
-
-        <div class="reveal feature-card" style="display: flex; gap: 16px; align-items: flex-start;">
-          <div class="icon-box" style="flex-shrink: 0;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>
-          </div>
-          <div>
-            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Free subdomain, forever</h3>
-            <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">Every project gets yourname.phaxar.xyz with automatic SSL. Upgrade only when you want your own domain.</p>
-          </div>
-        </div>
-
-        <div class="reveal feature-card" style="display: flex; gap: 16px; align-items: flex-start;">
-          <div class="icon-box" style="flex-shrink: 0;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-          <div>
-            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Secured by Rael</h3>
-            <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">Every site is scanned by Apaxaa's fraud and protection engine before it goes live.</p>
-          </div>
-        </div>
-
-        <div class="reveal feature-card" style="display: flex; gap: 16px; align-items: flex-start;">
-          <div class="icon-box" style="flex-shrink: 0;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
-          </div>
-          <div>
-            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Developer escape hatch</h3>
-            <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">Full Git workflow, environment variables, and preview deployments when you need control.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= ECOSYSTEM ================= -->
-<section style="padding: 60px 0 100px;">
-  <div class="container">
-    <div class="reveal" style="text-align: center; margin-bottom: 40px;">
-      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #a78bfa; margin-bottom: 12px;">Part of something bigger</div>
-      <h2 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700;">Built inside the Apaxaa ecosystem.</h2>
-      <p style="color: var(--muted); font-size: 14px; margin-top: 8px;">Phaxar doesn't stand alone. It plugs into the products Apaxaa already runs.</p>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
-      <div class="reveal glass" style="border-radius: 14px; padding: 20px; text-align: center;">
-        <div class="ecosystem-badge" style="margin-bottom: 10px; border-color: rgba(139,92,246,0.3); color: #c4b5fd;">Rael</div>
-        <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">Fraud & protection engine. Every Phaxar site is scanned before it goes live.</div>
-      </div>
-      <div class="reveal glass" style="border-radius: 14px; padding: 20px; text-align: center;">
-        <div class="ecosystem-badge" style="margin-bottom: 10px; border-color: rgba(52,211,153,0.3); color: #6ee7b7;">Joyet</div>
-        <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">Crypto fintech. Sites built on Phaxar can integrate Joyet payments.</div>
-      </div>
-      <div class="reveal glass" style="border-radius: 14px; padding: 20px; text-align: center;">
-        <div class="ecosystem-badge" style="margin-bottom: 10px; border-color: rgba(34,211,238,0.3); color: #67e8f9;">Candleben</div>
-        <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">Trading technology. Dashboards and data pages ship faster on Phaxar.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= PRICING ================= -->
-<section id="pricing" style="padding: 100px 0;">
-  <div class="container">
-    <div class="reveal" style="text-align: center; margin-bottom: 56px;">
-      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #d946ef; margin-bottom: 12px;">Pricing</div>
-      <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700;">Start free. Upgrade when it ships.</h2>
-      <p style="color: var(--muted); font-size: 14px; margin-top: 10px;">Naira pricing, no FX surprises. Cancel anytime.</p>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; align-items: stretch;">
-      <!-- Starter -->
-      <div class="reveal glass" style="border-radius: 18px; padding: 28px 24px; display: flex; flex-direction: column;">
-        <div style="font-size: 13px; font-weight: 600; color: #c4b5fd;">Starter</div>
-        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 6px;">
-          <span style="font-family: 'Hubot Sans'; font-size: 38px; font-weight: 700; letter-spacing: -0.03em;">₦0</span>
-          <span style="font-size: 12px; color: var(--muted);">forever</span>
-        </div>
-        <p style="font-size: 12px; color: var(--muted); margin-top: 6px;">For trying the magic.</p>
-        <ul style="list-style: none; margin-top: 22px; flex: 1; display: flex; flex-direction: column; gap: 10px;">
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> 3 AI generations / month</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> 1 project</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Free phaxar.xyz subdomain</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Automatic SSL</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Rael security scan</li>
+    <div class="compare reveal">
+      <div class="compare-col bad">
+        <h4>The usual AI builder</h4>
+        <ul>
+          <li><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg> A generic landing page, in dollars</li>
+          <li><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg> No WhatsApp, no local payments</li>
+          <li><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg> You still wire the domain yourself</li>
+          <li><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg> Hosting in a region far from your customers</li>
         </ul>
-        <a href="/new" class="btn-ghost" style="margin-top: 24px; width: 100%; font-size: 13px; padding: 11px;">Start free →</a>
       </div>
-
-      <!-- Builder -->
-      <div class="reveal" style="border-radius: 18px; padding: 28px 24px; display: flex; flex-direction: column; border: 1px solid rgba(139,92,246,0.35); background: linear-gradient(180deg, rgba(139,92,246,0.06), transparent); position: relative;">
-        <div style="position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, #8b5cf6, #d946ef); padding: 4px 14px; border-radius: 999px; font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; white-space: nowrap;">Most popular</div>
-        <div style="font-size: 13px; font-weight: 600; color: #c4b5fd;">Builder</div>
-        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 6px;">
-          <span style="font-family: 'Hubot Sans'; font-size: 38px; font-weight: 700; letter-spacing: -0.03em;">₦4,500</span>
-          <span style="font-size: 12px; color: var(--muted);">/ month</span>
-        </div>
-        <p style="font-size: 12px; color: var(--muted); margin-top: 6px;">For people shipping real sites.</p>
-        <ul style="list-style: none; margin-top: 22px; flex: 1; display: flex; flex-direction: column; gap: 10px;">
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> 50 AI generations / month</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> 10 projects</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Custom domain support</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> GitHub + manual deploy</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Priority build queue</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Email support</li>
+      <div class="compare-col good">
+        <h4>Phaxar</h4>
+        <ul>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> WhatsApp order buttons wired in</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Paystack checkout built in, priced in Naira</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> .ng domains and custom domains handled</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Templates for shops, salons, churches, schools</li>
         </ul>
-        <a href="/checkout?plan=builder" class="btn-primary" style="margin-top: 24px; width: 100%; font-size: 13px; padding: 11px;">Upgrade to Builder →</a>
-      </div>
-
-      <!-- Studio -->
-      <div class="reveal glass" style="border-radius: 18px; padding: 28px 24px; display: flex; flex-direction: column;">
-        <div style="font-size: 13px; font-weight: 600; color: #c4b5fd;">Studio</div>
-        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 6px;">
-          <span style="font-family: 'Hubot Sans'; font-size: 38px; font-weight: 700; letter-spacing: -0.03em;">₦15,000</span>
-          <span style="font-size: 12px; color: var(--muted);">/ month</span>
-        </div>
-        <p style="font-size: 12px; color: var(--muted); margin-top: 6px;">For agencies and teams.</p>
-        <ul style="list-style: none; margin-top: 22px; flex: 1; display: flex; flex-direction: column; gap: 10px;">
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Unlimited AI generations</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Unlimited projects</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Custom domains + DNS</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Team seats (up to 5)</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Rael deep scan + reports</li>
-          <li style="display: flex; gap: 8px; font-size: 13px; color: #c0c0d0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M5 13l4 4L19 7"/></svg> Dedicated support</li>
-        </ul>
-        <a href="mailto:hello@apaxaa.com" class="btn-ghost" style="margin-top: 24px; width: 100%; font-size: 13px; padding: 11px;">Talk to us →</a>
       </div>
     </div>
-
-    <p class="reveal" style="text-align: center; font-size: 11px; color: #4a4a5a; margin-top: 28px;">All plans include automatic SSL, free phaxar.xyz subdomain, and Rael security scanning. VAT added where applicable.</p>
   </div>
 </section>
 
-<!-- ================= DEVELOPERS ================= -->
-<section id="developers" style="padding: 40px 0 100px;">
-  <div class="container">
-    <div class="reveal" style="border-radius: 24px; border: 1px solid var(--border); background: linear-gradient(135deg, rgba(139,92,246,0.06), rgba(34,211,238,0.03)); padding: 40px 32px; position: relative; overflow: hidden;">
-      <div class="glow" style="right: -60px; top: -60px; width: 220px; height: 220px; background: rgba(139,92,246,0.2);"></div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 36px; align-items: center; position: relative;">
+<!-- ECOSYSTEM -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">Part of something bigger</span>
+      <h2>Built inside the Apaxaa ecosystem.</h2>
+      <p>Phaxar doesn't stand alone. It plugs into the products Apaxaa already runs.</p>
+    </div>
+    <div class="eco">
+      <div class="eco-card rael reveal">
+        <span class="eco-badge">Rael</span>
+        <h3>Fraud &amp; protection engine</h3>
+        <p>Every Phaxar site is scanned by Rael before it goes live. Phishing pages, credential forms, and card skimmers are blocked at deploy.</p>
+      </div>
+      <div class="eco-card joyet reveal">
+        <span class="eco-badge">Joyet</span>
+        <h3>Crypto fintech</h3>
+        <p>Sites built on Phaxar can integrate Joyet payments, bridging crypto and everyday money movement for your customers.</p>
+      </div>
+      <div class="eco-card candle reveal">
+        <span class="eco-badge">Candleben</span>
+        <h3>Trading technology</h3>
+        <p>Dashboards and data pages for Candleben ship faster on Phaxar, with the same edge infrastructure behind them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- PRICING -->
+<section class="sec" id="pricing">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">Pricing</span>
+      <h2>Start free. Upgrade when it ships.</h2>
+      <p>Naira pricing, no FX surprises. Cancel anytime.</p>
+    </div>
+    <div class="pricing">
+      <div class="plan reveal">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">₦0<small>forever</small></div>
+        <p class="plan-desc">For trying the magic.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> 3 AI generations / month</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> 1 project</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Free phaxar.xyz subdomain</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Automatic SSL</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Rael security scan</li>
+        </ul>
+        <a href="/new" class="btn btn-ghost">Start free →</a>
+      </div>
+      <div class="plan featured reveal">
+        <div class="plan-badge">Most popular</div>
+        <div class="plan-name">Builder</div>
+        <div class="plan-price">₦4,500<small>/ month</small></div>
+        <p class="plan-desc">For people shipping real sites.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> 50 AI generations / month</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> 10 projects</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Custom domain support</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> GitHub App + manual deploy</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Priority build queue</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Email support</li>
+        </ul>
+        <a href="/checkout?plan=builder" class="btn btn-primary">Upgrade to Builder →</a>
+      </div>
+      <div class="plan reveal">
+        <div class="plan-name">Studio</div>
+        <div class="plan-price">₦15,000<small>/ month</small></div>
+        <p class="plan-desc">For agencies and teams.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Unlimited AI generations</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Unlimited projects</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Custom domains + DNS</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Team seats (up to 5)</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Rael deep scan + reports</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg> Dedicated support</li>
+        </ul>
+        <a href="mailto:hello@apaxaa.com" class="btn btn-ghost">Talk to us →</a>
+      </div>
+    </div>
+    <p class="pricing-note">All plans include automatic SSL, free phaxar.xyz subdomain, and Rael security scanning. VAT added where applicable.</p>
+  </div>
+</section>
+
+<!-- DEVELOPERS -->
+<section class="sec" id="developers">
+  <div class="wrap">
+    <div class="dev reveal">
+      <div class="dev-grid">
         <div>
-          <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #a78bfa; margin-bottom: 12px;">For developers</div>
-          <h2 style="font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; line-height: 1.15;">Your workflow, unchanged.</h2>
-          <p style="color: var(--muted); font-size: 14px; line-height: 1.7; margin-top: 12px; max-width: 420px;">Connect GitHub, push to main, get a preview URL. Environment variables, build logs, rollbacks — the things you already expect, on infrastructure built for Africa.</p>
-          <div style="display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap;">
-            <a href="/docs" class="btn-primary" style="font-size: 13px; padding: 11px 20px;">Read the docs →</a>
-            <a href="https://github.com" class="btn-ghost" style="font-size: 13px; padding: 11px 20px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+          <span class="kicker">For developers</span>
+          <h2>Your workflow, unchanged.</h2>
+          <p>Connect a single repo with a read-only GitHub App, push to main, get a preview URL. Environment variables, build logs, rollbacks — the things you already expect, on infrastructure built for Africa.</p>
+          <div class="dev-actions">
+            <a href="/docs" class="btn btn-primary">Read the docs →</a>
+            <a href="https://github.com" class="btn btn-ghost">
+              <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
               View on GitHub
             </a>
           </div>
         </div>
         <div class="terminal">
-          <div class="terminal-bar">
-            <span style="background:#ff5f57;"></span><span style="background:#febc2e;"></span><span style="background:#28c840;"></span>
-            <span style="margin-left: 12px; font-size: 11px; color: #4a4a5a; font-family: 'Mona Sans';">terminal</span>
-          </div>
-          <div class="terminal-body">
-            <div><span class="t-comment"># deploy from CLI</span></div>
-            <div><span class="t-keyword">$</span> npx phaxar deploy</div>
-            <div style="margin-top: 6px;"><span class="t-keyword">→</span> Detected Next.js 14</div>
-            <div><span class="t-keyword">→</span> Installing dependencies…</div>
-            <div><span class="t-keyword">→</span> Building… <span class="t-success">done in 12.4s</span></div>
-            <div style="margin-top: 6px;"><span class="t-success">✓ Deployed to https://myapp.phaxar.xyz</span></div>
-            <div><span class="t-keyword">→</span> SSL issued · Rael scan passed</div>
-            <div style="margin-top: 6px;"><span class="t-comment"># rollback in one command</span></div>
-            <div><span class="t-keyword">$</span> npx phaxar rollback <span class="t-string">--to</span> previous</div>
-            <div><span class="t-success">✓ Restored in 0.8s</span></div>
+          <div class="term-bar"><i></i><i></i><i></i><span class="term-title">terminal</span></div>
+          <div class="term-body">
+            <div class="c"># deploy from CLI</div>
+            <div><span class="k">$</span> npx phaxar deploy</div>
+            <div style="margin-top:8px"><span class="k">→</span> Detected Next.js 14</div>
+            <div><span class="k">→</span> Installing dependencies…</div>
+            <div><span class="k">→</span> Building… <span class="ok">done in 12.4s</span></div>
+            <div style="margin-top:8px"><span class="ok">✓ Deployed to https://myapp.phaxar.xyz</span></div>
+            <div><span class="k">→</span> SSL issued · Rael scan passed</div>
+            <div style="margin-top:8px"><span class="c"># rollback in one command</span></div>
+            <div><span class="k">$</span> npx phaxar rollback <span class="s">--to</span> previous</div>
+            <div><span class="ok">✓ Restored in 0.8s</span></div>
           </div>
         </div>
       </div>
@@ -612,137 +612,176 @@
   </div>
 </section>
 
-<!-- ================= FAQ ================= -->
-<section style="padding: 80px 0 100px;">
-  <div class="container" style="max-width: 680px;">
-    <div class="reveal" style="text-align: center; margin-bottom: 40px;">
-      <h2 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700;">Questions, answered.</h2>
-    </div>
-
-    <div class="reveal glass" style="border-radius: 16px; overflow: hidden;">
+<!-- FAQ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal"><h2 style="font-family:var(--serif);font-weight:700;letter-spacing:-.045em;font-size:clamp(1.9rem,3.8vw,2.7rem)">Questions, answered.</h2></div>
+    <div class="faq reveal">
       <div class="faq-item">
-        <button class="faq-q">Do I need to know how to code?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div class="faq-a"><p>No. Describe your site in plain English and Phaxar builds it. If you do code, you can connect GitHub or upload files directly.</p></div>
+        <button class="faq-q">Do I need to know how to code?<svg viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a"><p>No. Describe your site in plain English and Phaxar builds it. If you do code, you can connect a GitHub repo or upload files directly.</p></div>
       </div>
       <div class="faq-item">
-        <button class="faq-q">Where are the sites hosted?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <button class="faq-q">Where are the sites hosted?<svg viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="faq-a"><p>On Phaxar's edge network, built on Vercel infrastructure, with data residency options in Nigeria through our infrastructure partners.</p></div>
       </div>
       <div class="faq-item">
-        <button class="faq-q">Can I use my own domain?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div class="faq-a"><p>Yes. On the Builder plan and above, you can attach any domain you own. We handle DNS verification and SSL automatically.</p></div>
+        <button class="faq-q">Can I use my own domain?<svg viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a"><p>Yes. On the Builder plan and above, you can attach any domain you own, including .ng domains. We handle DNS verification and SSL automatically.</p></div>
       </div>
       <div class="faq-item">
-        <button class="faq-q">What happens if I hit my generation limit?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div class="faq-a"><p>You can upgrade at any time. Unused generations do not roll over, but your existing sites stay live.</p></div>
+        <button class="faq-q">How do you stop phishing sites?<svg viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a"><p>User sites run on a separate domain from the Phaxar brand. Every generated page is scanned by Rael before deploy, forms that collect passwords or card details are blocked, and there is a report-abuse link on every site.</p></div>
       </div>
       <div class="faq-item">
-        <button class="faq-q">Is Phaxar a product of Apaxaa?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <button class="faq-q">Is Phaxar a product of Apaxaa?<svg viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="faq-a"><p>Yes. Phaxar is built and operated by Apaxaa Technologies Ltd (RC 9886261), the same team behind Joyet, Candleben, and Rael.</p></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= FINAL CTA ================= -->
-<section style="padding: 40px 0 100px;">
-  <div class="container" style="max-width: 720px;">
-    <div class="reveal" style="border-radius: 24px; border: 1px solid var(--border); background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(217,70,239,0.06), rgba(34,211,238,0.04)); padding: 52px 32px; text-align: center; position: relative; overflow: hidden;">
-      <div class="glow" style="left: 50%; top: -40px; width: 300px; height: 200px; transform: translateX(-50%); background: rgba(139,92,246,0.25);"></div>
-      <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700; line-height: 1.15; position: relative;">Your next website starts with a sentence.</h2>
-      <p style="color: var(--muted); font-size: 14px; margin-top: 12px; position: relative;">Join the builders shipping on Phaxar. Free to start, live in seconds, owned by you.</p>
-      <div style="display: flex; gap: 12px; justify-content: center; margin-top: 28px; flex-wrap: wrap; position: relative;">
-        <a href="/new" class="btn-primary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+<!-- CTA -->
+<section class="sec">
+  <div class="wrap">
+    <div class="cta reveal">
+      <h2>Your next website starts with a sentence.</h2>
+      <p>Join the builders shipping on Phaxar. Free to start, live in seconds, owned by you.</p>
+      <div class="cta-actions">
+        <a href="/new" class="btn btn-primary btn-lg">
+          <svg viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Build my site free
         </a>
-        <a href="mailto:hello@apaxaa.com" class="btn-ghost">Talk to us</a>
+        <a href="mailto:hello@apaxaa.com" class="btn btn-ghost btn-lg">Talk to us</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= FOOTER ================= -->
-<footer style="border-top: 1px solid var(--border); padding: 48px 0 36px;">
-  <div class="container">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 36px;">
-      <div>
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-          <div style="width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, #8b5cf6, #d946ef); display: grid; place-items: center;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-          </div>
-          <span style="font-family: 'Hubot Sans'; font-weight: 700; font-size: 15px;">Phaxar</span>
-        </div>
-        <p style="font-size: 11px; color: #5a5a6a; line-height: 1.7; max-width: 240px;">A product of Apaxaa Technologies Ltd. Engineering the future of technology, from Enugu to everywhere.</p>
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#" class="brand">
+          <div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="brand-name">Phaxar</span>
+        </a>
+        <p>A product of Apaxaa Technologies Ltd. Engineering the future of technology, from Enugu to everywhere.</p>
       </div>
-      <div>
-        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4a4a5a; margin-bottom: 12px;">Product</div>
-        <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
-          <li><a href="/new" style="color: var(--muted); text-decoration: none;">AI builder</a></li>
-          <li><a href="/docs" style="color: var(--muted); text-decoration: none;">Docs</a></li>
-          <li><a href="#pricing" style="color: var(--muted); text-decoration: none;">Pricing</a></li>
-          <li><a href="#" style="color: var(--muted); text-decoration: none;">Status</a></li>
-        </ul>
+      <div class="foot-col">
+        <h5>Product</h5>
+        <ul><li><a href="/new">AI builder</a></li><li><a href="/docs">Docs</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#">Status</a></li></ul>
       </div>
-      <div>
-        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4a4a5a; margin-bottom: 12px;">Company</div>
-        <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
-          <li><a href="https://apaxaa.com" style="color: var(--muted); text-decoration: none;">Apaxaa</a></li>
-          <li><a href="https://apaxaa.com/companies" style="color: var(--muted); text-decoration: none;">Companies</a></li>
-          <li><a href="https://apaxaa.com/careers" style="color: var(--muted); text-decoration: none;">Careers</a></li>
-          <li><a href="mailto:hello@apaxaa.com" style="color: var(--muted); text-decoration: none;">Contact</a></li>
-        </ul>
+      <div class="foot-col">
+        <h5>Company</h5>
+        <ul><li><a href="https://apaxaa.com">Apaxaa</a></li><li><a href="https://apaxaa.com/companies">Companies</a></li><li><a href="https://apaxaa.com/careers">Careers</a></li><li><a href="mailto:hello@apaxaa.com">Contact</a></li></ul>
       </div>
-      <div>
-        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4a4a5a; margin-bottom: 12px;">Legal</div>
-        <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
-          <li><a href="/privacy" style="color: var(--muted); text-decoration: none;">Privacy</a></li>
-          <li><a href="/terms" style="color: var(--muted); text-decoration: none;">Terms</a></li>
-          <li><a href="/dpa" style="color: var(--muted); text-decoration: none;">DPA</a></li>
-          <li><a href="/imprint" style="color: var(--muted); text-decoration: none;">Imprint</a></li>
-        </ul>
+      <div class="foot-col">
+        <h5>Legal</h5>
+        <ul><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="/abuse">Report abuse</a></li><li><a href="/imprint">Imprint</a></li></ul>
       </div>
     </div>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 10px;">
-      <p style="font-size: 11px; color: #3a3a4a;">© 2026 Apaxaa Technologies Ltd · RC 9886261. All rights reserved.</p>
-      <p style="font-size: 11px; color: #3a3a4a;">Phaxar — engineering the future of technology.</p>
+    <div class="foot-bottom">
+      <p>© 2026 Apaxaa Technologies Ltd · RC 9886261. All rights reserved.</p>
+      <p>Phaxar — engineering the future of technology.</p>
     </div>
   </div>
 </footer>
 
-<!-- ================= SCRIPTS ================= -->
 <script>
-  // Mobile menu
-  document.getElementById('menuBtn').addEventListener('click', function() {
-    document.getElementById('mobileMenu').classList.toggle('open');
-  });
+// nav scroll state
+const navOuter = document.getElementById('navOuter');
+window.addEventListener('scroll', () => {
+  navOuter.classList.toggle('scrolled', window.scrollY > 20);
+}, { passive: true });
 
-  // Scroll reveal
-  var reveals = document.querySelectorAll('.reveal');
-  var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-  reveals.forEach(function(el) { observer.observe(el); });
+// mobile menu
+const menuBtn = document.getElementById('menuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
 
-  // FAQ
-  document.querySelectorAll('.faq-q').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var answer = btn.nextElementSibling;
-      var chevron = btn.querySelector('.faq-chevron');
-      var isOpen = answer.classList.contains('open');
-      document.querySelectorAll('.faq-a').forEach(function(a) { a.classList.remove('open'); });
-      document.querySelectorAll('.faq-chevron').forEach(function(c) { c.classList.remove('open'); });
-      if (!isOpen) {
-        answer.classList.add('open');
-        chevron.classList.add('open');
-      }
-    });
+// reveal on scroll
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// FAQ: one answer open at a time
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const ans = btn.nextElementSibling;
+    const open = ans.classList.contains('open');
+    document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.faq-q').forEach(q => q.classList.remove('open'));
+    if (!open) { ans.classList.add('open'); btn.classList.add('open'); }
   });
+});
+
+// hero particle field: drifting dots, joined by faint lines when close.
+// Paused when off screen or when the visitor prefers less motion.
+(() => {
+  const canvas = document.getElementById('particles');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let w = 0, h = 0, dots = [], raf = 0, visible = true;
+
+  function size() {
+    const r = canvas.getBoundingClientRect();
+    w = r.width; h = r.height;
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const count = Math.min(110, Math.round((w * h) / 14000));
+    dots = Array.from({ length: count }, () => ({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25,
+      r: Math.random() * 1.4 + 0.4,
+      hue: Math.random() < 0.5 ? '196,181,253' : '103,232,249',
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    for (let i = 0; i < dots.length; i++) {
+      const a = dots[i];
+      for (let j = i + 1; j < dots.length; j++) {
+        const b = dots[j];
+        const dx = a.x - b.x, dy = a.y - b.y, d2 = dx * dx + dy * dy;
+        if (d2 < 120 * 120) {
+          ctx.strokeStyle = `rgba(139,92,246,${0.12 * (1 - Math.sqrt(d2) / 120)})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+      }
+      ctx.fillStyle = `rgba(${a.hue},0.7)`;
+      ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function step() {
+    for (const d of dots) {
+      d.x += d.vx; d.y += d.vy;
+      if (d.x < 0 || d.x > w) d.vx *= -1;
+      if (d.y < 0 || d.y > h) d.vy *= -1;
+    }
+    draw();
+    if (visible) raf = requestAnimationFrame(step);
+  }
+
+  size();
+  if (reduce) { draw(); return; }
+  raf = requestAnimationFrame(step);
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    cancelAnimationFrame(raf);
+    if (visible) raf = requestAnimationFrame(step);
+  }).observe(canvas);
+  let t;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(size, 150); }, { passive: true });
+})();
 </script>
 </body>
 </html>
